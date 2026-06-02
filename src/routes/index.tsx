@@ -262,16 +262,29 @@ function Index() {
             <p className="mt-3 text-muted-foreground">Testimonials will be added here soon.</p>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
-            {[1,2].map(i => (
+            {[
+              {
+                name: "Mary Joy A. Capsa",
+                role: "Lead Accountant, SGL Business Outsourcing OPC",
+                initials: "MJ",
+                quote: "Edmon was a great help to our company as an Assistant Bookkeeper. He diligently recorded expenses, sales, and imports, and carefully analyzed invoices and receipts to produce accurate reports. His work ethic and attention to detail truly stood out — dependable, thorough, and always willing to go the extra mile.",
+              },
+              {
+                name: "Mark Anthony M. Balisi",
+                role: "Cooperating Teacher, Punta Integrated School",
+                initials: "MA",
+                quote: "Edmon was a very great student teacher during his internship as a pre-service high school science teacher. He is incredibly teachable, open to criticism, and always acknowledges his shortcomings. He consistently strives to deliver the best work he can — a rare and admirable trait in a young educator.",
+              },
+            ].map((t, i) => (
               <div key={i} className="rounded-2xl border border-border bg-card p-8 shadow-[var(--shadow-card)]">
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-accent to-primary" />
+                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-accent to-primary grid place-items-center font-display font-bold text-primary-foreground text-sm">{t.initials}</div>
                   <div>
-                    <div className="font-semibold">Client Name</div>
-                    <div className="text-xs text-muted-foreground">Position, Company</div>
+                    <div className="font-semibold">{t.name}</div>
+                    <div className="text-xs text-muted-foreground">{t.role}</div>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground italic">"Testimonial content will be added here soon."</p>
+                <p className="text-sm text-muted-foreground italic">"{t.quote}"</p>
               </div>
             ))}
           </div>
