@@ -259,7 +259,7 @@ function Index() {
         <section id="testimonials" className="py-24">
           <div className="text-center mb-14">
             <h2 className="text-4xl lg:text-5xl font-bold">Client <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">Stories</span></h2>
-            <p className="mt-3 text-muted-foreground">Testimonials will be added here soon.</p>
+            <p className="mt-3 text-muted-foreground">What colleagues and mentors say about working with me.</p>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
             {[
