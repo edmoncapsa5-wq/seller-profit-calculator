@@ -186,12 +186,18 @@ function Index() {
         <section id="works" className="py-24">
           <div className="text-center mb-14">
             <h2 className="text-4xl lg:text-5xl font-bold">My Recent <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">Works</span></h2>
-            <p className="mt-3 text-muted-foreground">Sample projects will be added here soon.</p>
+            <p className="mt-3 text-muted-foreground">A selection of automation workflows I've built.</p>
           </div>
           <div className="grid sm:grid-cols-2 gap-6">
-            {[1,2,3,4].map(i => (
-              <div key={i} className="aspect-[4/3] rounded-2xl border border-border bg-card grid place-items-center text-muted-foreground shadow-[var(--shadow-card)]">
-                <span className="text-sm">Project showcase {i}</span>
+            {works.map((w, i) => (
+              <div key={i} className="group rounded-2xl border border-border bg-card overflow-hidden shadow-[var(--shadow-card)] hover:border-primary/50 transition">
+                <div className="aspect-[4/3] overflow-hidden bg-background">
+                  <img src={w.img} alt={w.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                </div>
+                <div className="p-5">
+                  <h3 className="font-semibold">{w.title}</h3>
+                  <p className="text-sm text-muted-foreground mt-1">{w.desc}</p>
+                </div>
               </div>
             ))}
           </div>
