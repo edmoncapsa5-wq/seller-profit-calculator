@@ -4,6 +4,18 @@ import {
   Workflow, Plug, Sparkles, Target, Mail, Phone, MapPin,
   Linkedin, Briefcase, GraduationCap, ArrowUpRight, Send
 } from "lucide-react";
+import edmonPortrait from "@/assets/edmon-portrait.jpg.asset.json";
+import bookkeepingImg from "@/assets/bookkeeping-automation.png.asset.json";
+import emailReplyImg from "@/assets/email-reply-automation.png.asset.json";
+import chatAgentImg from "@/assets/chat-ai-agent.png.asset.json";
+import databaseAutoImg from "@/assets/database-automation.png.asset.json";
+
+const works = [
+  { title: "Simple Bookkeeping Automation", desc: "Automated invoice extraction and QuickBooks bill creation using AI.", img: bookkeepingImg.url },
+  { title: "Email Reply Automation with AI Agent", desc: "Gmail-triggered AI agent that classifies and replies to messages using a Pinecone knowledge base.", img: emailReplyImg.url },
+  { title: "Chat AI Agent with Database Access", desc: "Conversational AI agent connected to a Pinecone vector store for contextual answers.", img: chatAgentImg.url },
+  { title: "Document Database Automation", desc: "Auto-ingest Google Drive files into a Pinecone vector database with OpenAI embeddings.", img: databaseAutoImg.url },
+];
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -118,8 +130,8 @@ function Index() {
 
           <div className="relative mx-auto">
             <div className="absolute -inset-8 rounded-full bg-gradient-to-br from-accent/40 to-primary/20 blur-3xl" />
-            <div className="relative h-80 w-80 lg:h-96 lg:w-96 rounded-full bg-gradient-to-br from-card to-secondary border border-border/50 shadow-[var(--shadow-card)] grid place-items-center overflow-hidden">
-              <span className="font-display text-[10rem] font-bold bg-gradient-to-br from-accent to-primary bg-clip-text text-transparent">EC</span>
+            <div className="relative h-80 w-80 lg:h-96 lg:w-96 rounded-full bg-gradient-to-br from-card to-secondary border border-border/50 shadow-[var(--shadow-card)] overflow-hidden">
+              <img src={edmonPortrait.url} alt="Edmon A. Capsa portrait" className="h-full w-full object-cover" />
             </div>
           </div>
         </section>
@@ -130,7 +142,7 @@ function Index() {
             { num: "—", label: "Years of Experience" },
             { num: "—", label: "Projects Completed" },
             { num: "—", label: "Happy Clients" },
-            { num: "—", label: "Workflows Built" },
+            { num: "10", label: "Workflows Built" },
           ].map((s, i) => (
             <div key={i} className="text-center lg:text-left">
               <div className="text-4xl font-display font-bold">{s.num}</div>
@@ -174,12 +186,18 @@ function Index() {
         <section id="works" className="py-24">
           <div className="text-center mb-14">
             <h2 className="text-4xl lg:text-5xl font-bold">My Recent <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">Works</span></h2>
-            <p className="mt-3 text-muted-foreground">Sample projects will be added here soon.</p>
+            <p className="mt-3 text-muted-foreground">A selection of automation workflows I've built.</p>
           </div>
           <div className="grid sm:grid-cols-2 gap-6">
-            {[1,2,3,4].map(i => (
-              <div key={i} className="aspect-[4/3] rounded-2xl border border-border bg-card grid place-items-center text-muted-foreground shadow-[var(--shadow-card)]">
-                <span className="text-sm">Project showcase {i}</span>
+            {works.map((w, i) => (
+              <div key={i} className="group rounded-2xl border border-border bg-card overflow-hidden shadow-[var(--shadow-card)] hover:border-primary/50 transition">
+                <div className="aspect-[4/3] overflow-hidden bg-background">
+                  <img src={w.img} alt={w.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                </div>
+                <div className="p-5">
+                  <h3 className="font-semibold">{w.title}</h3>
+                  <p className="text-sm text-muted-foreground mt-1">{w.desc}</p>
+                </div>
               </div>
             ))}
           </div>
