@@ -4,6 +4,18 @@ import {
   Workflow, Plug, Sparkles, Target, Mail, Phone, MapPin,
   Linkedin, Briefcase, GraduationCap, ArrowUpRight, Send
 } from "lucide-react";
+import edmonPortrait from "@/assets/edmon-portrait.jpg.asset.json";
+import bookkeepingImg from "@/assets/bookkeeping-automation.png.asset.json";
+import emailReplyImg from "@/assets/email-reply-automation.png.asset.json";
+import chatAgentImg from "@/assets/chat-ai-agent.png.asset.json";
+import databaseAutoImg from "@/assets/database-automation.png.asset.json";
+
+const works = [
+  { title: "Simple Bookkeeping Automation", desc: "Automated invoice extraction and QuickBooks bill creation using AI.", img: bookkeepingImg.url },
+  { title: "Email Reply Automation with AI Agent", desc: "Gmail-triggered AI agent that classifies and replies to messages using a Pinecone knowledge base.", img: emailReplyImg.url },
+  { title: "Chat AI Agent with Database Access", desc: "Conversational AI agent connected to a Pinecone vector store for contextual answers.", img: chatAgentImg.url },
+  { title: "Document Database Automation", desc: "Auto-ingest Google Drive files into a Pinecone vector database with OpenAI embeddings.", img: databaseAutoImg.url },
+];
 
 export const Route = createFileRoute("/")({
   head: () => ({
