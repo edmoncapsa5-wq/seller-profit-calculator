@@ -131,7 +131,7 @@ function Index() {
           <div className="relative mx-auto">
             <div className="absolute -inset-8 rounded-full bg-gradient-to-br from-accent/40 to-primary/20 blur-3xl" />
             <div className="relative h-80 w-80 lg:h-96 lg:w-96 rounded-full bg-gradient-to-br from-card to-secondary border border-border/50 shadow-[var(--shadow-card)] overflow-hidden">
-              <img src={edmonPortrait.url} alt="Edmon A. Capsa portrait" className="h-full w-full object-cover" />
+              <img src={edmonPortrait.url} alt="Edmon A. Capsa portrait" className="h-full w-full object-cover object-top scale-150 origin-top" />
             </div>
           </div>
         </section>
@@ -259,19 +259,32 @@ function Index() {
         <section id="testimonials" className="py-24">
           <div className="text-center mb-14">
             <h2 className="text-4xl lg:text-5xl font-bold">Client <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">Stories</span></h2>
-            <p className="mt-3 text-muted-foreground">Testimonials will be added here soon.</p>
+            <p className="mt-3 text-muted-foreground">What colleagues and mentors say about working with me.</p>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
-            {[1,2].map(i => (
+            {[
+              {
+                name: "Mary Joy A. Capsa",
+                role: "Lead Accountant, SGL Business Outsourcing OPC",
+                initials: "MJ",
+                quote: "Edmon was a great help to our company as an Assistant Bookkeeper. He diligently recorded expenses, sales, and imports, and carefully analyzed invoices and receipts to produce accurate reports. His work ethic and attention to detail truly stood out — dependable, thorough, and always willing to go the extra mile.",
+              },
+              {
+                name: "Mark Anthony M. Balisi",
+                role: "Cooperating Teacher, Punta Integrated School",
+                initials: "MA",
+                quote: "Edmon was a very great student teacher during his internship as a pre-service high school science teacher. He is incredibly teachable, open to criticism, and always acknowledges his shortcomings. He consistently strives to deliver the best work he can — a rare and admirable trait in a young educator.",
+              },
+            ].map((t, i) => (
               <div key={i} className="rounded-2xl border border-border bg-card p-8 shadow-[var(--shadow-card)]">
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-accent to-primary" />
+                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-accent to-primary grid place-items-center font-display font-bold text-primary-foreground text-sm">{t.initials}</div>
                   <div>
-                    <div className="font-semibold">Client Name</div>
-                    <div className="text-xs text-muted-foreground">Position, Company</div>
+                    <div className="font-semibold">{t.name}</div>
+                    <div className="text-xs text-muted-foreground">{t.role}</div>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground italic">"Testimonial content will be added here soon."</p>
+                <p className="text-sm text-muted-foreground italic">"{t.quote}"</p>
               </div>
             ))}
           </div>
