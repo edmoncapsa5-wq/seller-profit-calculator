@@ -154,7 +154,7 @@ function Index() {
             { num: "—", label: "Years of Experience" },
             { num: "—", label: "Projects Completed" },
             { num: "—", label: "Happy Clients" },
-            { num: "10", label: "Workflows Built" },
+            { num: "30", label: "Workflows Built" },
           ].map((s, i) => (
             <div key={i} className="text-center lg:text-left">
               <div className="text-4xl font-display font-bold">{s.num}</div>
