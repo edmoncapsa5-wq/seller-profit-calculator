@@ -4,7 +4,7 @@ import {
   Workflow, Plug, Sparkles, Target, Mail, Phone, MapPin,
   Linkedin, Briefcase, GraduationCap, ArrowUpRight, Send
 } from "lucide-react";
-import edmonPortrait from "@/assets/edmon-portrait.jpg.asset.json";
+import edmonPortrait from "@/assets/edmon-portrait-v2.jpg.asset.json";
 import bookkeepingImg from "@/assets/bookkeeping-automation.png.asset.json";
 import emailReplyImg from "@/assets/email-reply-automation.png.asset.json";
 import chatAgentImg from "@/assets/chat-ai-agent.png.asset.json";
@@ -131,7 +131,7 @@ function Index() {
           <div className="relative mx-auto">
             <div className="absolute -inset-8 rounded-full bg-gradient-to-br from-accent/40 to-primary/20 blur-3xl" />
             <div className="relative h-80 w-80 lg:h-96 lg:w-96 rounded-full bg-gradient-to-br from-card to-secondary border border-border/50 shadow-[var(--shadow-card)] overflow-hidden">
-              <img src={edmonPortrait.url} alt="Edmon A. Capsa portrait" className="h-full w-full object-cover object-top scale-150 origin-top" />
+              <img src={edmonPortrait.url} alt="Edmon A. Capsa portrait" className="h-full w-full object-cover object-center" />
             </div>
           </div>
         </section>
