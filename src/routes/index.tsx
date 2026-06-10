@@ -2,19 +2,31 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Workflow, Plug, Sparkles, Target, Mail, Phone, MapPin,
-  Linkedin, Briefcase, GraduationCap, ArrowUpRight, Send
+  Linkedin, Briefcase, GraduationCap, ArrowUpRight, Send, Folder
 } from "lucide-react";
 import edmonPortrait from "@/assets/edmon-portrait-v2.jpg.asset.json";
-import bookkeepingImg from "@/assets/bookkeeping-automation.png.asset.json";
-import emailReplyImg from "@/assets/email-reply-automation.png.asset.json";
-import chatAgentImg from "@/assets/chat-ai-agent.png.asset.json";
-import databaseAutoImg from "@/assets/database-automation.png.asset.json";
+import workTicketTriage from "@/assets/work-ticket-triage.jpg.asset.json";
+import workEmailRouting from "@/assets/work-email-routing.jpg.asset.json";
+import workKnowledgeBase from "@/assets/work-knowledge-base.jpg.asset.json";
+import workInvoiceApproval from "@/assets/work-invoice-approval.jpg.asset.json";
+import workContractReview from "@/assets/work-contract-review.jpg.asset.json";
+import workTicketRouting from "@/assets/work-ticket-routing.jpg.asset.json";
+import workOnboardOffboard from "@/assets/work-onboarding-offboarding.jpg.asset.json";
+import workOnboarding from "@/assets/work-onboarding.jpg.asset.json";
+import workInventory from "@/assets/work-inventory.jpg.asset.json";
+import workInvoiceProcessing from "@/assets/work-invoice-processing.jpg.asset.json";
 
 const works = [
-  { title: "Simple Bookkeeping Automation", desc: "Automated invoice extraction and QuickBooks bill creation using AI.", img: bookkeepingImg.url },
-  { title: "Email Reply Automation with AI Agent", desc: "Gmail-triggered AI agent that classifies and replies to messages using a Pinecone knowledge base.", img: emailReplyImg.url },
-  { title: "Chat AI Agent with Database Access", desc: "Conversational AI agent connected to a Pinecone vector store for contextual answers.", img: chatAgentImg.url },
-  { title: "Document Database Automation", desc: "Auto-ingest Google Drive files into a Pinecone vector database with OpenAI embeddings.", img: databaseAutoImg.url },
+  { title: "AI Customer Support Ticket Triage & Resolution", desc: "End-to-end ticket pipeline: AI classifies incoming requests, auto-resolves where possible, escalates the rest, and monitors SLA breaches every 15 minutes.", img: workTicketTriage.url },
+  { title: "AI Email Classification & Routing", desc: "Gmail-triggered workflow that classifies emails, extracts tasks, drafts meeting events, and sends a daily summary digest to the team.", img: workEmailRouting.url },
+  { title: "AI Knowledge Base & Internal Chatbot", desc: "Syncs SharePoint, Drive, and Notion docs into Pinecone, then answers employee questions via Slack, Teams, and web chat — with weekly knowledge-gap reports.", img: workKnowledgeBase.url },
+  { title: "AI-Powered Invoice Approval", desc: "Extracts invoice data from emailed PDFs, validates fields, checks duplicates, routes for approval, and archives the final invoice.", img: workInvoiceApproval.url },
+  { title: "Contract Review & Compliance", desc: "Webhook-triggered AI contract analysis that routes by risk level, alerts legal and procurement, and sends renewal alerts before expiration.", img: workContractReview.url },
+  { title: "Customer Support Ticket Routing", desc: "AI triages incoming tickets, round-robin assigns them to the right agent pool, calculates SLA deadlines, and sends satisfaction surveys on resolution.", img: workTicketRouting.url },
+  { title: "Employee Onboarding & Offboarding", desc: "Status-driven workflow that provisions or revokes Google, Microsoft 365, and Slack accounts, schedules orientation, and tracks compliance end-to-end.", img: workOnboardOffboard.url },
+  { title: "Employee Onboarding", desc: "New-hire form triggers account creation across Microsoft 365 and Slack, IT equipment requests, welcome emails, and daily reminders for incomplete tasks.", img: workOnboarding.url },
+  { title: "Inventory Monitoring & Low Stock Alerts", desc: "Daily inventory check with AI demand forecasting, multi-level purchase approvals, supplier inquiries, and a weekly procurement report.", img: workInventory.url },
+  { title: "Invoice Processing Automation", desc: "Gmail-triggered AI invoice extraction with duplicate checking, approval routing, QuickBooks invoice creation, and completion emails.", img: workInvoiceProcessing.url },
 ];
 
 export const Route = createFileRoute("/")({
