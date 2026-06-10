@@ -4,7 +4,7 @@ import {
   Workflow, Plug, Sparkles, Target, Mail, Phone, MapPin,
   Linkedin, Briefcase, GraduationCap, ArrowUpRight, Send
 } from "lucide-react";
-import edmonPortrait from "@/assets/edmon-portrait.jpg.asset.json";
+import edmonPortrait from "@/assets/edmon-portrait-v2.jpg.asset.json";
 import bookkeepingImg from "@/assets/bookkeeping-automation.png.asset.json";
 import emailReplyImg from "@/assets/email-reply-automation.png.asset.json";
 import chatAgentImg from "@/assets/chat-ai-agent.png.asset.json";
