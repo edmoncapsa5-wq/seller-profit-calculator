@@ -2,19 +2,31 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Workflow, Plug, Sparkles, Target, Mail, Phone, MapPin,
-  Linkedin, Briefcase, GraduationCap, ArrowUpRight, Send
+  Linkedin, Briefcase, GraduationCap, ArrowUpRight, Send, Folder
 } from "lucide-react";
 import edmonPortrait from "@/assets/edmon-portrait-v2.jpg.asset.json";
-import bookkeepingImg from "@/assets/bookkeeping-automation.png.asset.json";
-import emailReplyImg from "@/assets/email-reply-automation.png.asset.json";
-import chatAgentImg from "@/assets/chat-ai-agent.png.asset.json";
-import databaseAutoImg from "@/assets/database-automation.png.asset.json";
+import workTicketTriage from "@/assets/work-ticket-triage.jpg.asset.json";
+import workEmailRouting from "@/assets/work-email-routing.jpg.asset.json";
+import workKnowledgeBase from "@/assets/work-knowledge-base.jpg.asset.json";
+import workInvoiceApproval from "@/assets/work-invoice-approval.jpg.asset.json";
+import workContractReview from "@/assets/work-contract-review.jpg.asset.json";
+import workTicketRouting from "@/assets/work-ticket-routing.jpg.asset.json";
+import workOnboardOffboard from "@/assets/work-onboarding-offboarding.jpg.asset.json";
+import workOnboarding from "@/assets/work-onboarding.jpg.asset.json";
+import workInventory from "@/assets/work-inventory.jpg.asset.json";
+import workInvoiceProcessing from "@/assets/work-invoice-processing.jpg.asset.json";
 
 const works = [
-  { title: "Simple Bookkeeping Automation", desc: "Automated invoice extraction and QuickBooks bill creation using AI.", img: bookkeepingImg.url },
-  { title: "Email Reply Automation with AI Agent", desc: "Gmail-triggered AI agent that classifies and replies to messages using a Pinecone knowledge base.", img: emailReplyImg.url },
-  { title: "Chat AI Agent with Database Access", desc: "Conversational AI agent connected to a Pinecone vector store for contextual answers.", img: chatAgentImg.url },
-  { title: "Document Database Automation", desc: "Auto-ingest Google Drive files into a Pinecone vector database with OpenAI embeddings.", img: databaseAutoImg.url },
+  { title: "AI Customer Support Ticket Triage & Resolution", desc: "End-to-end ticket pipeline: AI classifies incoming requests, auto-resolves where possible, escalates the rest, and monitors SLA breaches every 15 minutes.", img: workTicketTriage.url },
+  { title: "AI Email Classification & Routing", desc: "Gmail-triggered workflow that classifies emails, extracts tasks, drafts meeting events, and sends a daily summary digest to the team.", img: workEmailRouting.url },
+  { title: "AI Knowledge Base & Internal Chatbot", desc: "Syncs SharePoint, Drive, and Notion docs into Pinecone, then answers employee questions via Slack, Teams, and web chat — with weekly knowledge-gap reports.", img: workKnowledgeBase.url },
+  { title: "AI-Powered Invoice Approval", desc: "Extracts invoice data from emailed PDFs, validates fields, checks duplicates, routes for approval, and archives the final invoice.", img: workInvoiceApproval.url },
+  { title: "Contract Review & Compliance", desc: "Webhook-triggered AI contract analysis that routes by risk level, alerts legal and procurement, and sends renewal alerts before expiration.", img: workContractReview.url },
+  { title: "Customer Support Ticket Routing", desc: "AI triages incoming tickets, round-robin assigns them to the right agent pool, calculates SLA deadlines, and sends satisfaction surveys on resolution.", img: workTicketRouting.url },
+  { title: "Employee Onboarding & Offboarding", desc: "Status-driven workflow that provisions or revokes Google, Microsoft 365, and Slack accounts, schedules orientation, and tracks compliance end-to-end.", img: workOnboardOffboard.url },
+  { title: "Employee Onboarding", desc: "New-hire form triggers account creation across Microsoft 365 and Slack, IT equipment requests, welcome emails, and daily reminders for incomplete tasks.", img: workOnboarding.url },
+  { title: "Inventory Monitoring & Low Stock Alerts", desc: "Daily inventory check with AI demand forecasting, multi-level purchase approvals, supplier inquiries, and a weekly procurement report.", img: workInventory.url },
+  { title: "Invoice Processing Automation", desc: "Gmail-triggered AI invoice extraction with duplicate checking, approval routing, QuickBooks invoice creation, and completion emails.", img: workInvoiceProcessing.url },
 ];
 
 export const Route = createFileRoute("/")({
@@ -142,7 +154,7 @@ function Index() {
             { num: "—", label: "Years of Experience" },
             { num: "—", label: "Projects Completed" },
             { num: "—", label: "Happy Clients" },
-            { num: "10", label: "Workflows Built" },
+            { num: "30", label: "Workflows Built" },
           ].map((s, i) => (
             <div key={i} className="text-center lg:text-left">
               <div className="text-4xl font-display font-bold">{s.num}</div>
@@ -188,15 +200,37 @@ function Index() {
             <h2 className="text-4xl lg:text-5xl font-bold">My Recent <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">Works</span></h2>
             <p className="mt-3 text-muted-foreground">A selection of automation workflows I've built.</p>
           </div>
-          <div className="grid sm:grid-cols-2 gap-6">
+          <div className="grid sm:grid-cols-2 gap-8 [perspective:1500px]">
             {works.map((w, i) => (
-              <div key={i} className="group rounded-2xl border border-border bg-card overflow-hidden shadow-[var(--shadow-card)] hover:border-primary/50 transition">
-                <div className="aspect-[4/3] overflow-hidden bg-background">
-                  <img src={w.img} alt={w.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div key={i} className="group relative pt-7">
+                {/* Folder tab */}
+                <div className="absolute top-0 left-6 h-8 w-40 rounded-t-xl bg-gradient-to-br from-accent to-primary shadow-[var(--shadow-glow)] flex items-center gap-2 pl-4 z-0">
+                  <Folder className="h-4 w-4 text-primary-foreground" />
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-primary-foreground">Project 0{i + 1}</span>
                 </div>
-                <div className="p-5">
-                  <h3 className="font-semibold">{w.title}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{w.desc}</p>
+                {/* Folder body */}
+                <div className="relative rounded-2xl rounded-tl-none border border-border bg-card overflow-hidden shadow-[var(--shadow-card)] transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[var(--shadow-glow)] group-hover:border-primary/50 [transform-style:preserve-3d]">
+                  {/* Folder flap (cover) — lifts open on hover */}
+                  <div className="absolute inset-0 z-20 origin-top bg-gradient-to-br from-card via-card to-secondary border-b-2 border-primary/40 transition-transform duration-700 ease-out [transform-style:preserve-3d] group-hover:[transform:rotateX(-110deg)]">
+                    <div className="h-full w-full p-6 flex flex-col justify-between">
+                      <div className="flex items-start justify-between">
+                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">Workflow</span>
+                        <ArrowUpRight className="h-4 w-4 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg leading-tight">{w.title}</h3>
+                        <p className="mt-2 text-xs text-muted-foreground">Hover to open folder</p>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Folder contents */}
+                  <div className="aspect-[4/3] overflow-hidden bg-background">
+                    <img src={w.img} alt={w.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  </div>
+                  <div className="p-5">
+                    <h3 className="font-semibold">{w.title}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">{w.desc}</p>
+                  </div>
                 </div>
               </div>
             ))}
