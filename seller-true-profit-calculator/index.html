@@ -1,27 +1,202 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Seller True-Profit Calculator</title><meta name="description" content="Free seller profit calculator for Shopee, TikTok Shop, Lazada and other marketplaces."><style>
-:root{--bg:#f6f3ea;--card:#fff;--ink:#17352f;--muted:#68766f;--line:#dedfd8;--brand:#1d6757;--danger:#9f2f2f;--warn:#946317;--pos:#2a6e58;--shadow:0 8px 28px rgba(23,53,47,.08)}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;line-height:1.45}.wrap{max-width:820px;margin:auto;padding:0 18px 70px}header{border-bottom:1px solid var(--line);background:#f2efe5}header .wrap{padding-top:38px;padding-bottom:34px}.badge{display:inline-block;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 11px;font-size:12px;font-weight:800;text-transform:uppercase;color:var(--muted)}h1,h2{font-family:Georgia,serif}h1{font-size:clamp(32px,7vw,48px);line-height:1.02;margin:14px 0 12px}h2{font-size:24px;margin:0 0 15px}.lead,.sub{color:var(--muted)}.lead{max-width:680px;font-size:15px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}section{margin-top:26px}.toolbar{display:grid;gap:14px;margin-top:24px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}label{display:block;font-weight:750;font-size:14px;margin-bottom:6px}.hint{display:block;color:var(--muted);font-size:12px;margin:-2px 0 8px}input,select,button{font:inherit}input,select{width:100%;height:48px;border:1px solid #cfd4cf;border-radius:12px;background:#fff;color:var(--ink);padding:0 13px}.field{margin-bottom:16px}.input-wrap{position:relative}.input-wrap input{padding-left:46px}.input-wrap.suffix input{padding-left:13px;padding-right:46px}.adorn{position:absolute;inset:0 auto 0 0;width:44px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:800;pointer-events:none}.suffix .adorn{left:auto;right:0}button{min-height:48px;border-radius:12px;border:1px solid var(--line);padding:0 14px;font-weight:800;cursor:pointer;background:#f3f1e9;color:var(--ink)}.grid{display:grid;gap:16px}.sticky-summary{position:sticky;top:8px;z-index:20;margin-top:18px}.summary{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:0 8px 26px rgba(23,53,47,.11)}.money{font-size:28px;font-weight:900}.small{font-size:12px;color:var(--muted);font-weight:700}.pill{display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:999px;font-size:11px;font-weight:900;min-width:92px}.pill.empty{background:#f0f1ef;color:#6a736d}.pill.loss{background:#fff0f0;color:var(--danger)}.pill.thin{background:#fff7df;color:var(--warn)}.pill.positive{background:#edf8f3;color:var(--pos)}.pill.strong{background:#ddf4ea;color:#165c48}.result-hero{padding:22px}.big-money{font-size:42px;font-weight:950;margin-top:5px}.result-label{display:flex;justify-content:space-between;gap:14px}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:20px}.metric strong{font-size:26px;display:block}.row{display:flex;justify-content:space-between;gap:20px;padding:10px 0;border-bottom:1px solid #eceeea;font-size:14px}.row:last-child{border:0}.targets{list-style:none;padding:0;margin:8px 0 0}.targets li{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid #eceeea}.alert{display:none;border:1px solid #e8bcbc;background:#fff0f0;border-radius:14px;padding:14px;color:#702727;font-size:13px;margin-top:14px}details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:0 15px;margin:9px 0}summary{cursor:pointer;font-weight:800;padding:14px 0}details p{padding:0 0 14px;color:var(--muted);font-size:13px}.cta{background:#eff2ec}.cta ul{display:grid;grid-template-columns:1fr 1fr;gap:7px 18px;padding-left:18px;font-size:13px}.interest{width:100%;margin-top:15px;background:var(--brand);color:white;border-color:var(--brand)}footer{text-align:center;color:var(--muted);font-size:12px;padding-top:26px}@media(min-width:700px){.toolbar{grid-template-columns:1fr auto;align-items:end}.grid.two{grid-template-columns:1fr 1fr}}
-</style></head><body><header><div class="wrap"><span class="badge">Free seller tool</span><h1>Seller True-Profit Calculator</h1><p class="lead">See what you actually keep per order after platform fees, commissions, discounts, shipping, ads and other seller costs. Enter your own rates so it works across Shopee, TikTok Shop, Lazada and other marketplaces.</p></div></header><main class="wrap">
-<section class="card toolbar"><div><label>Currency</label><select id="currency"></select><input id="customCurrency" style="display:none;margin-top:8px" maxlength="4" placeholder="Custom symbol"></div><div class="actions"><button id="exampleBtn">Try an example</button><button id="resetBtn">Reset</button></div></section>
-<div class="sticky-summary"><div class="summary"><div><div class="small">Actual profit per order</div><div class="money" id="stickyProfit">₱0.00</div><div class="small" id="stickyMargin">Enter a selling price to begin</div></div><span class="pill empty" id="stickyState">—</span></div></div>
-<section><h2>Your numbers</h2><div class="card"><div class="grid two">
-<div class="field"><label>Selling price</label><span class="hint">Amount the buyer pays.</span><div class="input-wrap"><span class="adorn currency-symbol">₱</span><input id="sellingPrice" inputmode="decimal"></div></div>
-<div class="field"><label>Product / item cost</label><span class="hint">Supplier price or cost to make it.</span><div class="input-wrap"><span class="adorn currency-symbol">₱</span><input id="productCost" inputmode="decimal"></div></div>
-<div class="field"><label>Packaging cost</label><span class="hint">Pouch, box, bubble wrap, labels, inserts.</span><div class="input-wrap"><span class="adorn currency-symbol">₱</span><input id="packagingCost" inputmode="decimal"></div></div>
-<div class="field"><label>Marketplace / platform fee %</label><span class="hint">Use your actual platform/category rate.</span><div class="input-wrap suffix"><span class="adorn">%</span><input id="platformFeePct" inputmode="decimal"></div></div>
-<div class="field"><label>Affiliate / creator commission %</label><span class="hint">Leave 0 if not applicable.</span><div class="input-wrap suffix"><span class="adorn">%</span><input id="affiliatePct" inputmode="decimal"></div></div>
-<div class="field"><label>Payment / transaction fee %</label><span class="hint">Gateway, COD or transaction fee.</span><div class="input-wrap suffix"><span class="adorn">%</span><input id="paymentFeePct" inputmode="decimal"></div></div>
-<div class="field"><label>Tax / withholding % (optional)</label><span class="hint">Only if actually deducted from selling price.</span><div class="input-wrap suffix"><span class="adorn">%</span><input id="taxPct" inputmode="decimal"></div></div>
-<div class="field"><label>Seller-funded discount</label><span class="hint">Voucher/discount you shoulder.</span><div class="input-wrap"><span class="adorn currency-symbol">₱</span><input id="discount" inputmode="decimal"></div></div>
-<div class="field"><label>Shipping paid by you</label><span class="hint">Shipping subsidy or freight you cover.</span><div class="input-wrap"><span class="adorn currency-symbol">₱</span><input id="shippingSubsidy" inputmode="decimal"></div></div>
-<div class="field"><label>Advertising cost per order</label><span class="hint">Ad spend divided by orders.</span><div class="input-wrap"><span class="adorn currency-symbol">₱</span><input id="adCost" inputmode="decimal"></div></div>
-<div class="field"><label>Other variable cost</label><span class="hint">Labor, fuel, returns allowance, add-ons.</span><div class="input-wrap"><span class="adorn currency-symbol">₱</span><input id="otherCost" inputmode="decimal"></div></div>
-</div></div></section>
-<div class="alert" id="feeAlert"></div>
-<section><h2>Your results</h2><div class="card result-hero"><div class="result-label"><div><div class="sub">Actual profit per order</div><div class="big-money" id="profit">₱0.00</div></div><span class="pill empty" id="statePill">—</span></div><p class="sub" id="stateText">Enter a selling price to see your result.</p><div class="metrics"><div class="metric"><span class="sub">Profit margin</span><strong id="margin">—</strong></div><div class="metric"><span class="sub">Markup</span><strong id="markup">—</strong></div></div></div>
-<div class="card" style="margin-top:14px"><div class="row"><span>Gross revenue</span><span id="gross">₱0.00</span></div><div class="row"><span id="pctLabel">Percentage deductions</span><span id="pctDed">- ₱0.00</span></div><div class="row"><span>Fixed & variable costs</span><span id="fixed">- ₱0.00</span></div><div class="row"><span>Total deductions and costs</span><span id="totalDed">- ₱0.00</span></div><div class="row"><strong>Actual profit</strong><span id="profit2">₱0.00</span></div></div>
-<div class="card" style="margin-top:14px"><h2 style="font-size:20px">Break-even selling price</h2><div class="money" id="breakEven">₱0.00</div></div><div class="card" style="margin-top:14px"><h2 style="font-size:20px">Suggested prices for target margin</h2><ul class="targets" id="targets"></ul></div></section>
-<section><h2>How this works</h2><details><summary>How is profit calculated?</summary><p>Selling price minus percentage deductions minus product cost and all other per-order costs.</p></details><details><summary>Margin vs markup</summary><p>Margin is profit divided by selling price. Markup is profit divided by product cost.</p></details><details><summary>Why isn't break-even simply cost + fees?</summary><p>Percentage fees grow as price grows, so break-even uses fixed costs ÷ (1 − total percentage rate).</p></details><p class="sub">Estimate only. Marketplace fees, taxes, shipping, refunds and program-specific charges vary. Use your actual applicable figures.</p></section>
-<section class="card cta"><h2>Seller Profit Toolkit</h2><p class="sub">Coming soon: SKU profitability, pricing planner, expenses, inventory, ad-spend tracking and a weekly profit dashboard.</p><ul><li>SKU profitability tracker</li><li>Pricing planner</li><li>Expense tracker</li><li>Inventory tracker</li><li>Ad-spend tracker</li><li>Weekly dashboard</li></ul><button class="interest" id="interestBtn">I want the Seller Profit Toolkit</button><p class="sub" id="interestNote" style="margin-top:8px">Interest is recorded on this device only for now.</p></section><footer>Seller True-Profit Calculator — free utility for online sellers.</footer></main>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Seller True-Profit Calculator</title>
+  <meta name="description" content="Free seller profit calculator for Shopee, TikTok Shop, Lazada and other online marketplaces. Calculate actual profit, margin, break-even price and target pricing using your own fee rates." />
+  <meta name="keywords" content="seller profit calculator, Shopee profit calculator, TikTok Shop profit calculator, Lazada profit calculator, product margin calculator, online seller pricing calculator" />
+  <style>
+    :root{
+      --bg:#f6f3ea; --surface:#fffdf8; --card:#ffffff; --ink:#17352f; --muted:#68766f;
+      --line:#dedfd8; --brand:#1d6757; --brand2:#e9f2ee; --danger:#9f2f2f; --danger-bg:#fff0f0;
+      --warn:#946317; --warn-bg:#fff7df; --pos:#2a6e58; --pos-bg:#edf8f3; --strong:#165c48;
+      --shadow:0 8px 28px rgba(23,53,47,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.45}
+    button,input,select{font:inherit}
+    .wrap{max-width:820px;margin:auto;padding:0 18px 70px}
+    header{border-bottom:1px solid var(--line);background:linear-gradient(180deg,#f2efe5 0,#f6f3ea 100%)}
+    header .wrap{padding-top:38px;padding-bottom:34px}
+    .badge{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 11px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+    h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(32px,7vw,48px);line-height:1.02;margin:14px 0 12px;letter-spacing:-.025em}
+    h2{font-family:Georgia,"Times New Roman",serif;font-size:24px;margin:0 0 15px}
+    h3{font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 14px}
+    p{margin:0}.lead{max-width:680px;color:var(--muted);font-size:15px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}
+    .toolbar{display:grid;grid-template-columns:1fr;gap:14px;margin-top:24px}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    label{display:block;font-weight:750;font-size:14px;margin-bottom:6px}
+    .hint{display:block;color:var(--muted);font-size:12px;margin:-2px 0 8px}
+    input,select{width:100%;height:48px;border:1px solid #cfd4cf;border-radius:12px;background:#fff;color:var(--ink);padding:0 13px;outline:none}
+    input:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(29,103,87,.12)}
+    .field{margin-bottom:16px}.field:last-child{margin-bottom:0}
+    .input-wrap{position:relative}.input-wrap input{padding-left:46px}.input-wrap.suffix input{padding-left:13px;padding-right:46px}
+    .adorn{position:absolute;inset:0 auto 0 0;width:44px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:800;pointer-events:none}
+    .suffix .adorn{left:auto;right:0}
+    button{min-height:48px;border-radius:12px;border:1px solid var(--line);padding:0 14px;font-weight:800;cursor:pointer}
+    .primary{background:var(--brand);color:white;border-color:var(--brand)} .secondary{background:#f3f1e9;color:var(--ink)}
+    section{margin-top:26px}.grid{display:grid;gap:16px}.input-card{margin-bottom:14px}
+    .sticky-summary{position:sticky;top:8px;z-index:20;margin-top:18px}
+    .summary{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;border:1px solid var(--line);background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-radius:16px;padding:14px 16px;box-shadow:0 8px 26px rgba(23,53,47,.11)}
+    .summary .small{font-size:12px;color:var(--muted);font-weight:700}.summary .money{font-size:28px;font-weight:900;font-variant-numeric:tabular-nums}
+    .pill{display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:999px;font-size:11px;font-weight:900;min-width:92px;text-align:center}
+    .pill.empty{background:#f0f1ef;color:#6a736d}.pill.loss{background:var(--danger-bg);color:var(--danger)}.pill.thin{background:var(--warn-bg);color:var(--warn)}
+    .pill.positive{background:var(--pos-bg);color:var(--pos)}.pill.strong{background:#ddf4ea;color:var(--strong)}
+    .result-hero{padding:22px}.result-hero.loss{border-color:#ebbbbb;background:var(--danger-bg)}.result-hero.thin{border-color:#ead199;background:var(--warn-bg)}
+    .result-hero.positive{border-color:#bcded2;background:var(--pos-bg)}.result-hero.strong{border-color:#acd6c8;background:#e8f6f1}
+    .result-label{display:flex;justify-content:space-between;gap:14px;align-items:center}.big-money{font-size:42px;font-weight:950;margin-top:5px;font-variant-numeric:tabular-nums}
+    .sub{color:var(--muted);font-size:13px}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:20px}.metric strong{font-size:26px;display:block}
+    .rows{margin-top:14px}.row{display:flex;justify-content:space-between;gap:20px;padding:10px 0;border-bottom:1px solid #eceeea;font-size:14px}.row:last-child{border:0}.row span:last-child{font-variant-numeric:tabular-nums;font-weight:800;text-align:right}
+    .targets{list-style:none;padding:0;margin:8px 0 0}.targets li{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid #eceeea}.targets li:last-child{border:0}.targets strong{font-variant-numeric:tabular-nums;text-align:right}
+    .alert{border:1px solid #e8bcbc;background:var(--danger-bg);border-radius:14px;padding:14px;color:#702727;font-size:13px;margin-top:14px;display:none}
+    details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:0 15px;margin:9px 0}summary{cursor:pointer;font-weight:800;padding:14px 0}details p{padding:0 0 14px;color:var(--muted);font-size:13px}
+    .cta{background:#eff2ec}.cta ul{display:grid;grid-template-columns:1fr 1fr;gap:7px 18px;padding-left:18px;color:#3c4c45;font-size:13px}
+    .interest{margin-top:15px;width:100%;background:var(--brand);color:white;border-color:var(--brand)}.interest-note{font-size:12px;color:var(--muted);margin-top:10px}
+    footer{text-align:center;color:var(--muted);font-size:12px;padding-top:26px}
+    @media (min-width:700px){.toolbar{grid-template-columns:1fr auto;align-items:end}.toolbar .actions{min-width:310px}.grid.two{grid-template-columns:1fr 1fr}.sticky-summary{top:14px}.cta ul{grid-template-columns:1fr 1fr 1fr}}
+  </style>
+</head>
+<body>
+<header><div class="wrap">
+  <span class="badge">Free seller tool</span>
+  <h1>Seller True-Profit Calculator</h1>
+  <p class="lead">See what you actually keep per order after platform fees, commissions, discounts, shipping, ads and other seller costs. Enter your own rates so the calculator stays useful across Shopee, TikTok Shop, Lazada and other marketplaces.</p>
+</div></header>
+
+<main class="wrap">
+  <section class="card toolbar">
+    <div><label for="currency">Currency</label><select id="currency"></select><input id="customCurrency" style="display:none;margin-top:8px" maxlength="4" placeholder="Custom symbol" /></div>
+    <div class="actions"><button class="secondary" id="exampleBtn">Try an example</button><button class="secondary" id="resetBtn">Reset</button></div>
+  </section>
+
+  <div class="sticky-summary">
+    <div class="summary">
+      <div><div class="small">Actual profit per order</div><div class="money" id="stickyProfit">₱0.00</div><div class="small" id="stickyMargin">Enter a selling price to begin</div></div>
+      <span class="pill empty" id="stickyState">—</span>
+    </div>
+  </div>
+
+  <section>
+    <h2>Your numbers</h2>
+    <div class="card input-card"><h3>Price & product</h3>
+      <div class="field"><label>Selling price</label><span class="hint">The amount the buyer pays for the item.</span><div class="input-wrap"><span class="adorn currency-symbol">₱</span><input id="sellingPrice" inputmode="decimal" /></div></div>
+      <div class="field"><label>Product / item cost</label><span class="hint">Supplier price or cost to make the item.</span><div class="input-wrap"><span class="adorn currency-symbol">₱</span><input id="productCost" inputmode="decimal" /></div></div>
+      <div class="field"><label>Packaging cost</label><span class="hint">Pouch, box, bubble wrap, labels, inserts and similar materials.</span><div class="input-wrap"><span class="adorn currency-symbol">₱</span><input id="packagingCost" inputmode="decimal" /></div></div>
+    </div>
+
+    <div class="card input-card"><h3>Percentage deductions — applied to selling price</h3>
+      <div class="grid two">
+        <div class="field"><label>Marketplace / platform fee %</label><span class="hint">Use your actual platform/category rate.</span><div class="input-wrap suffix"><span class="adorn">%</span><input id="platformFeePct" inputmode="decimal" /></div></div>
+        <div class="field"><label>Affiliate / creator commission %</label><span class="hint">Leave at 0 if not applicable.</span><div class="input-wrap suffix"><span class="adorn">%</span><input id="affiliatePct" inputmode="decimal" /></div></div>
+        <div class="field"><label>Payment / transaction fee %</label><span class="hint">Payment gateway, COD or transaction fee if applicable.</span><div class="input-wrap suffix"><span class="adorn">%</span><input id="paymentFeePct" inputmode="decimal" /></div></div>
+        <div class="field"><label>Tax / withholding % (optional)</label><span class="hint">Enter only a percentage deduction that actually applies to this sale.</span><div class="input-wrap suffix"><span class="adorn">%</span><input id="taxPct" inputmode="decimal" /></div></div>
+      </div>
+    </div>
+
+    <div class="card input-card"><h3>Other per-order costs</h3>
+      <div class="grid two">
+        <div class="field"><label>Seller-funded discount</label><span class="hint">Voucher/discount amount you shoulder.</span><div class="input-wrap"><span class="adorn currency-symbol">₱</span><input id="discount" inputmode="decimal" /></div></div>
+        <div class="field"><label>Shipping paid by you</label><span class="hint">Shipping subsidy or freight you cover.</span><div class="input-wrap"><span class="adorn currency-symbol">₱</span><input id="shippingSubsidy" inputmode="decimal" /></div></div>
+        <div class="field"><label>Advertising cost per order</label><span class="hint">Example: ₱3,000 ad spend ÷ 100 orders = ₱30/order.</span><div class="input-wrap"><span class="adorn currency-symbol">₱</span><input id="adCost" inputmode="decimal" /></div></div>
+        <div class="field"><label>Other variable cost</label><span class="hint">Returns allowance, labor, fuel, platform add-ons, etc.</span><div class="input-wrap"><span class="adorn currency-symbol">₱</span><input id="otherCost" inputmode="decimal" /></div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="alert" id="feeAlert"></div>
+
+  <section>
+    <h2>Your results</h2>
+    <div class="card result-hero" id="resultHero">
+      <div class="result-label"><div><div class="sub">Actual profit per order</div><div class="big-money" id="profit">₱0.00</div></div><span class="pill empty" id="statePill">—</span></div>
+      <p class="sub" id="stateText">Enter a selling price to see your result.</p>
+      <div class="metrics"><div class="metric"><span class="sub">Profit margin</span><strong id="margin">—</strong><span class="sub">of selling price</span></div><div class="metric"><span class="sub">Net return on product cost</span><strong id="markup">—</strong><span class="sub">profit ÷ product cost</span></div></div>
+    <p class="sub" style="margin-top:10px">Margin labels are descriptive only and are not financial or pricing recommendations.</p></div>
+
+    <div class="card" style="margin-top:14px"><h3>Breakdown</h3><div class="rows">
+      <div class="row"><span>Gross revenue</span><span id="gross">₱0.00</span></div>
+      <div class="row"><span id="pctLabel">Percentage deductions</span><span id="pctDed">- ₱0.00</span></div>
+      <div class="row"><span>Fixed & variable costs</span><span id="fixed">- ₱0.00</span></div>
+      <div class="row"><span>Total deductions and costs</span><span id="totalDed">- ₱0.00</span></div>
+      <div class="row"><strong>Actual profit</strong><span id="profit2">₱0.00</span></div>
+    </div></div>
+
+    <div class="card" style="margin-top:14px"><h3>Break-even selling price</h3><div class="big-money" style="font-size:30px" id="breakEven">₱0.00</div><p class="sub">The selling price where profit is approximately zero using the same percentage deductions and per-order costs.</p></div>
+
+    <div class="card" style="margin-top:14px"><h3>Suggested prices for target margin</h3><ul class="targets" id="targets"></ul></div>
+  </section>
+
+  <section><h2>How this works</h2>
+    <details><summary>How is profit calculated?</summary><p>Selling price minus percentage-based deductions minus product cost and all other per-order costs. Percentage deductions are assumed to apply to the selling price.</p></details>
+    <details><summary>What do the percentage results mean?</summary><p>Profit margin is profit divided by selling price. Net return on product cost is actual profit divided by product cost. The second figure is not traditional markup; it shows how much net profit remains relative to the item cost after all entered deductions.</p></details>
+    <details><summary>Why isn't break-even simply cost + fees?</summary><p>Percentage fees rise when price rises. Break-even therefore uses fixed costs ÷ (1 − total percentage rate). Target-margin prices use fixed costs ÷ (1 − percentage rate − target margin).</p></details>
+    <p class="sub" style="margin-top:12px"><strong>Calculation assumption:</strong> For consistency, percentage deductions are applied to the entered selling price, while seller-funded discounts are treated as a separate per-order deduction. Your platform may use a different fee base; check your order statement.</p><p class="sub" style="margin-top:12px">Estimate only. Marketplace fees, taxes, shipping arrangements, refunds, returns and program-specific charges vary. Enter your actual applicable figures and verify them against platform statements before making pricing decisions.</p>
+  </section>
+
+  <section class="card cta">
+    <h3>Coming soon</h3><h2 style="margin-bottom:8px">Seller Profit Toolkit</h2>
+    <p class="sub">A deeper toolkit for sellers who want to track profitability beyond a single order.</p>
+    <ul><li>SKU profitability tracker</li><li>Pricing planner</li><li>Expense tracker</li><li>Inventory tracker</li><li>Ad-spend tracker</li><li>Weekly profit dashboard</li></ul>
+    <button class="interest" id="interestBtn">I want the Seller Profit Toolkit</button>
+    <p class="interest-note" id="interestNote">This records interest only on this device for now—no account or email required.</p>
+  </section>
+  <footer>Seller True-Profit Calculator — free utility for online sellers.</footer>
+</main>
+
 <script>
-const ids=['sellingPrice','productCost','packagingCost','platformFeePct','affiliatePct','paymentFeePct','taxPct','discount','shippingSubsidy','adCost','otherCost'];const cur=[['PHP','₱'],['USD','$'],['EUR','€'],['GBP','£'],['SGD','S$'],['MYR','RM'],['IDR','Rp'],['THB','฿'],['CUSTOM','']];const demo={sellingPrice:799,productCost:320,packagingCost:15,platformFeePct:6,affiliatePct:10,paymentFeePct:2.5,taxPct:1,discount:50,shippingSubsidy:40,adCost:35,otherCost:10};const $=x=>document.getElementById(x),safe=v=>{v=parseFloat(v);return Number.isFinite(v)&&v>=0?v:0};function sym(){return $('currency').value==='CUSTOM'?($('customCurrency').value.trim()||'¤'):(cur.find(x=>x[0]===$('currency').value)?.[1]||'₱')}function money(v){if(v===null||!Number.isFinite(v))return'—';return(v<0?'-':'')+sym()+Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}function pct(v){return v===null?'—':v.toFixed(1)+'%'}function calc(){const i=Object.fromEntries(ids.map(id=>[id,safe($(id).value)])),rate=(i.platformFeePct+i.affiliatePct+i.paymentFeePct+i.taxPct)/100,fixed=i.productCost+i.packagingCost+i.discount+i.shippingSubsidy+i.adCost+i.otherCost,pctDed=i.sellingPrice*rate,totalDed=pctDed+fixed,profit=i.sellingPrice-totalDed,margin=i.sellingPrice>0?profit/i.sellingPrice*100:null,markup=i.productCost>0?profit/i.productCost*100:null,impossible=rate>=1,breakEven=impossible?null:fixed/(1-rate),targets=[.1,.2,.3,.4,.5].map(t=>({t,p:1-rate-t>0?fixed/(1-rate-t):null}));let state='empty';if(i.sellingPrice>0){if(profit<0)state='loss';else if(margin<10)state='thin';else if(margin<25)state='positive';else state='strong'}return{i,rate,fixed,pctDed,totalDed,profit,margin,markup,impossible,breakEven,targets,state}}const meta={empty:['—','Enter a selling price to see your result.'],loss:['Loss','This order loses money using the figures entered.'],thin:['Thin margin','Positive, but with limited room for extra costs or returns.'],positive:['Positive margin','A positive margin using the figures entered.'],strong:['Strong margin','A higher positive margin using the figures entered.']};function render(){const r=calc(),m=meta[r.state];['statePill','stickyState'].forEach(id=>{$(id).className='pill '+r.state;$(id).textContent=m[0]});$('profit').textContent=$('profit2').textContent=$('stickyProfit').textContent=money(r.profit);$('margin').textContent=pct(r.margin);$('markup').textContent=pct(r.markup);$('stateText').textContent=m[1];$('stickyMargin').textContent=r.margin===null?'Enter a selling price to begin':pct(r.margin)+' margin';$('gross').textContent=money(r.i.sellingPrice);$('pctLabel').textContent='Percentage deductions ('+pct(r.rate*100)+')';$('pctDed').textContent='- '+money(r.pctDed);$('fixed').textContent='- '+money(r.fixed);$('totalDed').textContent='- '+money(r.totalDed);$('breakEven').textContent=money(r.breakEven);$('targets').innerHTML=r.targets.map(x=>`<li><span>${x.t*100}% margin</span><strong>${x.p===null?'Not possible with these fees':money(x.p)}</strong></li>`).join('');$('feeAlert').style.display=r.impossible?'block':'none';$('feeAlert').textContent=r.impossible?'Percentage deductions are 100% or more. Break-even and target-margin prices cannot be calculated.':'';document.querySelectorAll('.currency-symbol').forEach(e=>e.textContent=sym())}ids.forEach(id=>$(id).addEventListener('input',()=>{let e=$(id);e.value=e.value.replace(/[^0-9.]/g,'').replace(/(\..*)\./g,'$1');render()}));cur.forEach(([c,s])=>$('currency').add(new Option(c+' — '+s,c)));$('currency').value='PHP';$('currency').onchange=()=>{$('customCurrency').style.display=$('currency').value==='CUSTOM'?'block':'none';render()};$('customCurrency').oninput=render;$('exampleBtn').onclick=()=>{ids.forEach(id=>$(id).value=demo[id]??'');render()};$('resetBtn').onclick=()=>{ids.forEach(id=>$(id).value='');render()};$('interestBtn').onclick=()=>{localStorage.setItem('sellerToolkitInterest','yes');$('interestBtn').textContent='Interest recorded ✓';$('interestBtn').disabled=true};if(localStorage.getItem('sellerToolkitInterest')==='yes'){$('interestBtn').textContent='Interest recorded ✓';$('interestBtn').disabled=true}render();
-</script></body></html>
+const ids=["sellingPrice","productCost","packagingCost","platformFeePct","affiliatePct","paymentFeePct","taxPct","discount","shippingSubsidy","adCost","otherCost"];
+const CURRENCIES=[["PHP","₱","PHP — Philippine Peso"],["USD","$","USD — US Dollar"],["EUR","€","EUR — Euro"],["GBP","£","GBP — British Pound"],["SGD","S$","SGD — Singapore Dollar"],["MYR","RM","MYR — Malaysian Ringgit"],["IDR","Rp","IDR — Indonesian Rupiah"],["THB","฿","THB — Thai Baht"],["CUSTOM","","Custom symbol"]];
+const DEMO={sellingPrice:799,productCost:320,packagingCost:15,platformFeePct:6,affiliatePct:10,paymentFeePct:2.5,taxPct:1,discount:50,shippingSubsidy:40,adCost:35,otherCost:10};
+const $=id=>document.getElementById(id);
+const safe=v=>{const n=parseFloat(v);return Number.isFinite(n)&&n>=0?n:0};
+function symbol(){const code=$("currency").value; if(code==="CUSTOM") return $("customCurrency").value.trim()||"¤"; return CURRENCIES.find(x=>x[0]===code)?.[1]||"₱"}
+function money(v){if(v===null||!Number.isFinite(v))return "—";const sign=v<0?"-":"";return sign+symbol()+Math.abs(v).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function pct(v){return v===null||!Number.isFinite(v)?"—":v.toFixed(1)+"%"}
+function calc(){
+ const i=Object.fromEntries(ids.map(id=>[id,safe($(id).value)]));
+ const rate=(i.platformFeePct+i.affiliatePct+i.paymentFeePct+i.taxPct)/100;
+ const fixed=i.productCost+i.packagingCost+i.discount+i.shippingSubsidy+i.adCost+i.otherCost;
+ const pctDed=i.sellingPrice*rate,totalDed=pctDed+fixed,profit=i.sellingPrice-totalDed;
+ const margin=i.sellingPrice>0?profit/i.sellingPrice*100:null;
+ const markup=i.productCost>0?profit/i.productCost*100:null;
+ const impossible=rate>=1;
+ const breakEven=impossible?null:fixed/(1-rate);
+ const targets=[.10,.20,.30,.40,.50].map(t=>({t,p:1-rate-t>0?fixed/(1-rate-t):null}));
+ let state="empty";
+ if(i.sellingPrice>0){if(profit<0)state="loss";else if(margin<10)state="thin";else if(margin<25)state="positive";else state="strong"}
+ return {i,rate,fixed,pctDed,totalDed,profit,margin,markup,impossible,breakEven,targets,state}
+}
+const stateMeta={
+ empty:["—","Enter a selling price to see your result."],
+ loss:["Loss","This order loses money using the figures entered."],
+ thin:["Thin margin","Positive, but with limited room for extra costs or returns."],
+ positive:["Positive margin","A positive margin using the figures entered."],
+ strong:["Strong margin","A higher positive margin using the figures entered."]
+};
+function render(){
+ const r=calc(), meta=stateMeta[r.state];
+ ["statePill","stickyState"].forEach(id=>{const e=$(id);e.className="pill "+r.state;e.textContent=meta[0]});
+ $("resultHero").className="card result-hero "+r.state;
+ $("profit").textContent=$("profit2").textContent=$("stickyProfit").textContent=money(r.profit);
+ $("margin").textContent=pct(r.margin); $("markup").textContent=pct(r.markup); $("stateText").textContent=meta[1];
+ $("stickyMargin").textContent=r.margin===null?"Enter a selling price to begin":pct(r.margin)+" margin";
+ $("gross").textContent=money(r.i.sellingPrice);$("pctLabel").textContent="Percentage deductions ("+pct(r.rate*100)+")";
+ $("pctDed").textContent="- "+money(r.pctDed);$("fixed").textContent="- "+money(r.fixed);$("totalDed").textContent="- "+money(r.totalDed);$("breakEven").textContent=money(r.breakEven);
+ $("targets").innerHTML=r.targets.map(x=>`<li><span>${Math.round(x.t*100)}% margin</span><strong>${x.p===null?"Not possible with these fees":money(x.p)}</strong></li>`).join("");
+ const a=$("feeAlert"); if(r.impossible){a.style.display="block";a.textContent=`Your percentage deductions total ${pct(r.rate*100)}. At 100% or more, break-even and target-margin prices cannot be calculated. Check the rates entered.`}else a.style.display="none";
+ document.querySelectorAll(".currency-symbol").forEach(e=>e.textContent=symbol());
+}
+function validInput(el){el.addEventListener("input",()=>{el.value=el.value.replace(/[^0-9.]/g,"").replace(/(\..*)\./g,"$1");render()})}
+ids.forEach(id=>validInput($(id)));
+const sel=$("currency"); CURRENCIES.forEach(([c,s,l])=>sel.add(new Option(l,c))); sel.value="PHP";
+sel.addEventListener("change",()=>{$("customCurrency").style.display=sel.value==="CUSTOM"?"block":"none";render()});
+$("customCurrency").addEventListener("input",render);
+$("exampleBtn").onclick=()=>{ids.forEach(id=>$(id).value=DEMO[id]??"");render()};
+$("resetBtn").onclick=()=>{ids.forEach(id=>$(id).value="");render()};
+$("interestBtn").onclick=()=>{localStorage.setItem("sellerToolkitInterest","yes");$("interestBtn").textContent="Interest recorded ✓";$("interestBtn").disabled=true;$("interestNote").textContent="Recorded on this device. When we connect a real waitlist, this can become a measurable conversion CTA."};
+if(localStorage.getItem("sellerToolkitInterest")==="yes"){$("interestBtn").textContent="Interest recorded ✓";$("interestBtn").disabled=true}
+render();
+</script>
+</body></html>
