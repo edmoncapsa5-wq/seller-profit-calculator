@@ -1,8 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 import {
-  Workflow, Plug, Sparkles, Target, Mail, Phone, MapPin,
-  Linkedin, Briefcase, GraduationCap, ArrowUpRight, Send, Folder
+  ArrowUpRight,
+  BookOpenCheck,
+  Briefcase,
+  CheckCircle2,
+  Database,
+  FileSpreadsheet,
+  Folder,
+  GraduationCap,
+  Linkedin,
+  Mail,
+  MapPin,
+  Search,
+  ShieldCheck,
+  Workflow,
 } from "lucide-react";
 import edmonPortrait from "@/assets/edmon-portrait-v2.jpg.asset.json";
 import workTicketTriage from "@/assets/work-ticket-triage.jpg.asset.json";
@@ -10,32 +21,140 @@ import workEmailRouting from "@/assets/work-email-routing.jpg.asset.json";
 import workKnowledgeBase from "@/assets/work-knowledge-base.jpg.asset.json";
 import workInvoiceApproval from "@/assets/work-invoice-approval.jpg.asset.json";
 import workContractReview from "@/assets/work-contract-review.jpg.asset.json";
-import workTicketRouting from "@/assets/work-ticket-routing.jpg.asset.json";
-import workOnboardOffboard from "@/assets/work-onboarding-offboarding.jpg.asset.json";
-import workOnboarding from "@/assets/work-onboarding.jpg.asset.json";
 import workInventory from "@/assets/work-inventory.jpg.asset.json";
-import workInvoiceProcessing from "@/assets/work-invoice-processing.jpg.asset.json";
 
-const works = [
-  { title: "AI Customer Support Ticket Triage & Resolution", desc: "End-to-end ticket pipeline: AI classifies incoming requests, auto-resolves where possible, escalates the rest, and monitors SLA breaches every 15 minutes.", img: workTicketTriage.url },
-  { title: "AI Email Classification & Routing", desc: "Gmail-triggered workflow that classifies emails, extracts tasks, drafts meeting events, and sends a daily summary digest to the team.", img: workEmailRouting.url },
-  { title: "AI Knowledge Base & Internal Chatbot", desc: "Syncs SharePoint, Drive, and Notion docs into Pinecone, then answers employee questions via Slack, Teams, and web chat — with weekly knowledge-gap reports.", img: workKnowledgeBase.url },
-  { title: "AI-Powered Invoice Approval", desc: "Extracts invoice data from emailed PDFs, validates fields, checks duplicates, routes for approval, and archives the final invoice.", img: workInvoiceApproval.url },
-  { title: "Contract Review & Compliance", desc: "Webhook-triggered AI contract analysis that routes by risk level, alerts legal and procurement, and sends renewal alerts before expiration.", img: workContractReview.url },
-  { title: "Customer Support Ticket Routing", desc: "AI triages incoming tickets, round-robin assigns them to the right agent pool, calculates SLA deadlines, and sends satisfaction surveys on resolution.", img: workTicketRouting.url },
-  { title: "Employee Onboarding & Offboarding", desc: "Status-driven workflow that provisions or revokes Google, Microsoft 365, and Slack accounts, schedules orientation, and tracks compliance end-to-end.", img: workOnboardOffboard.url },
-  { title: "Employee Onboarding", desc: "New-hire form triggers account creation across Microsoft 365 and Slack, IT equipment requests, welcome emails, and daily reminders for incomplete tasks.", img: workOnboarding.url },
-  { title: "Inventory Monitoring & Low Stock Alerts", desc: "Daily inventory check with AI demand forecasting, multi-level purchase approvals, supplier inquiries, and a weekly procurement report.", img: workInventory.url },
-  { title: "Invoice Processing Automation", desc: "Gmail-triggered AI invoice extraction with duplicate checking, approval routing, QuickBooks invoice creation, and completion emails.", img: workInvoiceProcessing.url },
+const caseStudies = [
+  {
+    title: "Accounting Document Control & Encoding Support",
+    desc: "A controlled workflow for preparing sales and expense documents, validating source data, isolating exceptions, and keeping accounting-support work traceable before encoding.",
+    tags: ["Accounting Support", "Data Validation", "Documentation"],
+    img: workInvoiceApproval.url,
+  },
+  {
+    title: "Spreadsheet & Data Quality Operations",
+    desc: "A practical cleanup approach for duplicate detection, field validation, exception handling, and safe import preparation without guessing when business identity is unclear.",
+    tags: ["Spreadsheets", "Data Cleanup", "CRM Support"],
+    img: workInventory.url,
+  },
+  {
+    title: "Administrative Request & Email Triage",
+    desc: "A structured intake model that classifies requests, identifies required action and owner, separates routine work from exceptions, and keeps follow-ups visible.",
+    tags: ["Admin Operations", "Inbox Support", "Follow-up"],
+    img: workEmailRouting.url,
+  },
+  {
+    title: "SOP & Knowledge Base Organization",
+    desc: "A documentation system that turns scattered instructions into clear procedures, decision rules, exception paths, and reference material that another person can continue using.",
+    tags: ["SOPs", "Documentation", "Knowledge Management"],
+    img: workKnowledgeBase.url,
+  },
+  {
+    title: "Research-to-Decision Workflow",
+    desc: "A research process that separates facts, assumptions, unknowns, and recommendations so decision-makers receive concise findings instead of raw information overload.",
+    tags: ["Research", "Verification", "Decision Support"],
+    img: workContractReview.url,
+  },
+  {
+    title: "Workflow Automation & Exception Routing",
+    desc: "Representative automation work focused on deterministic rules, validation, safe routing, and human review for ambiguous or consequential cases rather than blind automation.",
+    tags: ["n8n", "Automation", "Process Control"],
+    img: workTicketTriage.url,
+  },
+];
+
+const services = [
+  {
+    icon: FileSpreadsheet,
+    title: "Administrative & Spreadsheet Support",
+    desc: "Data entry, cleanup, trackers, reconciliation support, reporting preparation, file organization, and repeatable administrative workflows.",
+  },
+  {
+    icon: BookOpenCheck,
+    title: "Documentation & SOP Support",
+    desc: "Clear procedures, checklists, handoff notes, knowledge bases, templates, and documentation designed for easy continuation by the next person.",
+  },
+  {
+    icon: Search,
+    title: "Research & Decision Support",
+    desc: "Structured research, source checking, comparison tables, summaries, and recommendations that distinguish verified facts from assumptions.",
+  },
+  {
+    icon: Workflow,
+    title: "Process & Automation Support",
+    desc: "Workflow mapping and AI-assisted automation support with validation, exception handling, and human review where business judgment is required.",
+  },
+];
+
+const experience = [
+  {
+    period: "Recent",
+    title: "Teaching Intern",
+    org: "Punta Integrated School",
+    points: [
+      "Prepared lesson plans, presentations, instructional materials, and classroom records for multiple Grade 9 sections.",
+      "Tracked performance, computed grades, organized learning activities, and maintained deadline-sensitive documentation.",
+      "Managed simultaneous classroom, administrative, and communication responsibilities in a structured environment.",
+    ],
+  },
+  {
+    period: "Previous",
+    title: "Assistant Bookkeeper",
+    org: "SGL Business Outsourcing Services OPC",
+    points: [
+      "Supported expense and sales transaction encoding in QuickBooks Online.",
+      "Reviewed invoices and receipts, categorized transactions, and assisted with bill-payment preparation and accounting records.",
+      "Worked with journals, ledgers, supporting documents, and detail-sensitive financial data under review procedures.",
+    ],
+  },
+];
+
+const capabilities = [
+  "Administrative operations",
+  "Spreadsheet cleanup & validation",
+  "Data entry & reconciliation support",
+  "Accounting operations support",
+  "Research & source verification",
+  "SOPs, checklists & documentation",
+  "CRM/data-quality support",
+  "Process mapping & coordination",
+  "AI-assisted workflow execution",
+  "Canva & presentation support",
+  "QuickBooks Online exposure",
+  "n8n / automation workflow exposure",
+];
+
+const principles = [
+  {
+    icon: CheckCircle2,
+    title: "Clear status, not noise",
+    desc: "I translate working details into concise status, impact, action, and next-step updates.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "No guessing on consequential data",
+    desc: "Routine corrections can move quickly; ambiguous identities, financial meaning, or permissions are isolated and escalated rather than assumed.",
+  },
+  {
+    icon: Database,
+    title: "Traceable work",
+    desc: "I prefer controlled source files, explicit exceptions, reproducible steps, and handoffs another person can continue.",
+  },
 ];
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Edmon A. Capsa — Workflow Automation Specialist" },
-      { name: "description", content: "Portfolio of Edmon A. Capsa, a workflow automation specialist building AI agents and automated workflows with Zapier, n8n, and Make.com." },
-      { property: "og:title", content: "Edmon A. Capsa — Workflow Automation Specialist" },
-      { property: "og:description", content: "Building AI agents and automated workflows with Zapier, n8n, and Make.com." },
+      { title: "Edmon A. Capsa — Operations & Administrative Virtual Assistant" },
+      {
+        name: "description",
+        content:
+          "Portfolio of Edmon A. Capsa — Operations & Administrative Virtual Assistant focused on research, spreadsheets, documentation, accounting support, process management, and AI-assisted workflows.",
+      },
+      { property: "og:title", content: "Edmon A. Capsa — Operations & Administrative Virtual Assistant" },
+      {
+        property: "og:description",
+        content: "AI-assisted research, spreadsheets, documentation, accounting support, and process management.",
+      },
     ],
   }),
   component: Index,
@@ -46,190 +165,153 @@ const Logo = () => (
     <div className="relative grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-accent to-primary shadow-[var(--shadow-glow)]">
       <span className="font-display text-sm font-bold text-primary-foreground">EC</span>
     </div>
-    <span className="font-display text-lg font-semibold tracking-tight">Edmon</span>
+    <span className="font-display text-lg font-semibold tracking-tight">Edmon Capsa</span>
   </div>
 );
 
 const navLinks = [
   { label: "Services", href: "#services" },
+  { label: "Case Studies", href: "#work" },
   { label: "Experience", href: "#experience" },
-  { label: "Education", href: "#education" },
-  { label: "Works", href: "#works" },
   { label: "Skills", href: "#skills" },
-  { label: "Testimonials", href: "#testimonials" },
+  { label: "How I Work", href: "#principles" },
   { label: "Contact", href: "#contact" },
 ];
 
-const services = [
-  { icon: Workflow, title: "Workflow Automation", desc: "Designing end-to-end automated workflows using Zapier, n8n, and Make.com to eliminate repetitive tasks." },
-  { icon: Sparkles, title: "AI Agents & Automation", desc: "Building AI agents and AI-powered automated workflows tailored to streamline business operations." },
-  { icon: Plug, title: "API Integration", desc: "Connecting tools and platforms via APIs and webhooks for seamless data flow across your stack." },
-  { icon: Target, title: "Funnel & CRM Management", desc: "Funnel building, lead generation, and CRM management with GoHighLevel for growing businesses." },
-];
-
-const experience = [
-  { period: "Recent", title: "Teaching Intern", org: "Punta Integrated School", points: [
-    "Created daily lesson plans and presentations teaching 3–5 sections of Grade 9 students",
-    "Evaluated student performance and computed grades",
-    "Managed classrooms ensuring a positive learning environment and proctored examinations",
-  ]},
-  { period: "Previous", title: "Assistant Bookkeeper", org: "SGL Business Outsourcing Services OPC", points: [
-    "Encoded expense and sales transactions in QuickBooks Online",
-    "Analyzed accounts and categorized each transaction, making payments of bills",
-    "Wrote accounts on journals and ledgers",
-  ]},
-];
-
-const education = [
-  { period: "2022 – 2026", title: "Bachelor of Secondary Education Major in Science", org: "City College of Calamba" },
-];
-
-const skills = [
-  { name: "Zapier", level: 90 },
-  { name: "n8n", level: 88 },
-  { name: "Make.com", level: 85 },
-  { name: "API Integration", level: 80 },
-  { name: "GoHighLevel", level: 82 },
-  { name: "Prompt Engineering", level: 86 },
-];
-
 function Index() {
-  const [activeService, setActiveService] = useState(0);
-
   return (
     <div className="min-h-screen text-foreground">
-      {/* Nav */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/60 border-b border-border/50">
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/70 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <Logo />
-          <nav className="hidden lg:flex items-center gap-7 text-sm text-muted-foreground">
-            {navLinks.map(l => (
-              <a key={l.href} href={l.href} className="hover:text-foreground transition-colors">{l.label}</a>
+          <nav className="hidden items-center gap-7 text-sm text-muted-foreground lg:flex">
+            {navLinks.map((link) => (
+              <a key={link.href} href={link.href} className="transition-colors hover:text-foreground">
+                {link.label}
+              </a>
             ))}
           </nav>
-          <a href="#contact" className="rounded-full bg-gradient-to-r from-accent to-primary px-5 py-2 text-sm font-medium text-primary-foreground shadow-[var(--shadow-glow)] hover:opacity-90 transition">
-            Hire me
+          <a
+            href="mailto:edmon.capsa5@gmail.com"
+            className="rounded-full bg-gradient-to-r from-accent to-primary px-5 py-2 text-sm font-medium text-primary-foreground shadow-[var(--shadow-glow)] transition hover:opacity-90"
+          >
+            Contact me
           </a>
         </div>
       </header>
 
       <main className="mx-auto max-w-7xl px-6">
-        {/* Hero */}
-        <section className="grid lg:grid-cols-2 gap-12 items-center py-20 lg:py-28">
+        <section className="grid items-center gap-12 py-20 lg:grid-cols-2 lg:py-28">
           <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground mb-4">I am Edmon</p>
-            <h1 className="text-5xl lg:text-7xl font-bold leading-[1.05]">
-              Workflow <br/>
-              <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">Automation</span> Specialist
+            <p className="mb-4 text-sm uppercase tracking-[0.3em] text-muted-foreground">Remote operations support</p>
+            <h1 className="text-5xl font-bold leading-[1.05] lg:text-7xl">
+              Operations &<br />
+              <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
+                Administrative VA
+              </span>
             </h1>
-            <p className="mt-6 text-lg text-muted-foreground max-w-xl">
-              I build AI agents and automated workflows using tools like Zapier and n8n — helping businesses eliminate repetitive work and scale with intelligent automation.
+            <p className="mt-6 max-w-2xl text-lg text-muted-foreground">
+              I support businesses with research, spreadsheets, documentation, accounting operations, data quality, and process coordination—using AI and automation to move routine work faster while keeping important exceptions under human review.
+            </p>
+            <p className="mt-4 max-w-2xl text-sm font-medium text-foreground/90">
+              AI-Assisted Research • Spreadsheets • Documentation • Accounting Support • Process Management
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <a href="#contact" className="rounded-full bg-gradient-to-r from-accent to-primary px-7 py-3 font-medium text-primary-foreground shadow-[var(--shadow-glow)] hover:opacity-90 transition">
-                Hire me now
+              <a
+                href="#work"
+                className="rounded-full bg-gradient-to-r from-accent to-primary px-7 py-3 font-medium text-primary-foreground shadow-[var(--shadow-glow)] transition hover:opacity-90"
+              >
+                View work samples
               </a>
-              <div className="flex gap-3">
-                <a href="https://www.linkedin.com/in/edmon-capsa-21523a40a" target="_blank" rel="noreferrer" className="grid h-11 w-11 place-items-center rounded-full border border-border hover:border-primary hover:text-primary transition">
-                  <Linkedin className="h-4 w-4" />
-                </a>
-                <a href="mailto:edmon.capsa5@gmail.com" className="grid h-11 w-11 place-items-center rounded-full border border-border hover:border-primary hover:text-primary transition">
-                  <Mail className="h-4 w-4" />
-                </a>
-              </div>
+              <a
+                href="https://www.linkedin.com/in/edmon-capsa-21523a40a"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm transition hover:border-primary hover:text-primary"
+              >
+                LinkedIn <ArrowUpRight className="h-4 w-4" />
+              </a>
             </div>
           </div>
 
           <div className="relative mx-auto">
             <div className="absolute -inset-8 rounded-full bg-gradient-to-br from-accent/40 to-primary/20 blur-3xl" />
-            <div className="relative h-80 w-80 lg:h-96 lg:w-96 rounded-full bg-gradient-to-br from-card to-secondary border border-border/50 shadow-[var(--shadow-card)] overflow-hidden">
-              <img src={edmonPortrait.url} alt="Edmon A. Capsa portrait" className="h-full w-full object-cover object-center" />
+            <div className="relative h-80 w-80 overflow-hidden rounded-full border border-border/50 bg-gradient-to-br from-card to-secondary shadow-[var(--shadow-card)] lg:h-96 lg:w-96">
+              <img src={edmonPortrait.url} alt="Edmon A. Capsa" className="h-full w-full object-cover object-center" />
             </div>
           </div>
         </section>
 
-        {/* Stats */}
-        <section className="grid grid-cols-2 lg:grid-cols-4 gap-6 border-y border-border py-10">
-          {[
-            { num: "—", label: "Years of Experience" },
-            { num: "—", label: "Projects Completed" },
-            { num: "—", label: "Happy Clients" },
-            { num: "30", label: "Workflows Built" },
-          ].map((s, i) => (
-            <div key={i} className="text-center lg:text-left">
-              <div className="text-4xl font-display font-bold">{s.num}</div>
-              <div className="text-sm text-muted-foreground mt-1">{s.label}</div>
-            </div>
-          ))}
+        <section className="grid gap-4 border-y border-border py-8 sm:grid-cols-3">
+          <div>
+            <div className="text-sm uppercase tracking-wider text-muted-foreground">Positioning</div>
+            <div className="mt-1 font-semibold">Operations & Administrative Support</div>
+          </div>
+          <div>
+            <div className="text-sm uppercase tracking-wider text-muted-foreground">Working style</div>
+            <div className="mt-1 font-semibold">Structured, detail-aware, AI-assisted</div>
+          </div>
+          <div>
+            <div className="text-sm uppercase tracking-wider text-muted-foreground">Location</div>
+            <div className="mt-1 font-semibold">Laguna, Philippines • Remote</div>
+          </div>
         </section>
 
-        {/* Services */}
         <section id="services" className="py-24">
-          <div className="text-center mb-14">
-            <h2 className="text-4xl lg:text-5xl font-bold">My Quality <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">Services</span></h2>
-            <p className="mt-3 text-muted-foreground max-w-xl mx-auto">Automation services designed to save time, reduce errors, and scale your business operations.</p>
+          <div className="mb-14 text-center">
+            <h2 className="text-4xl font-bold lg:text-5xl">
+              What I can <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">support</span>
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
+              Practical support for teams that need reliable execution, organized information, and clear follow-through.
+            </p>
           </div>
-          <div className="max-w-3xl mx-auto space-y-3">
-            {services.map((s, i) => {
-              const active = activeService === i;
-              const Icon = s.icon;
+          <div className="grid gap-5 md:grid-cols-2">
+            {services.map((service) => {
+              const Icon = service.icon;
               return (
-                <button
-                  key={i}
-                  onClick={() => setActiveService(i)}
-                  className={`w-full text-left rounded-2xl border border-border p-5 transition-all flex items-start gap-5 ${active ? "bg-gradient-to-r from-accent to-primary shadow-[var(--shadow-glow)]" : "bg-card hover:border-primary/50"}`}
-                >
-                  <div className={`text-xs font-mono mt-1 w-8 ${active ? "text-primary-foreground" : "text-muted-foreground"}`}>0{i+1}</div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3">
-                      <Icon className={`h-5 w-5 ${active ? "text-primary-foreground" : "text-primary"}`} />
-                      <h3 className={`text-lg font-semibold ${active ? "text-primary-foreground" : ""}`}>{s.title}</h3>
-                    </div>
-                    {active && <p className="mt-3 text-sm text-primary-foreground/90 max-w-2xl">{s.desc}</p>}
-                  </div>
-                  <ArrowUpRight className={`h-5 w-5 mt-1 ${active ? "text-primary-foreground" : "text-muted-foreground"}`} />
-                </button>
+                <div key={service.title} className="rounded-2xl border border-border bg-card p-6 transition hover:border-primary/50">
+                  <Icon className="h-6 w-6 text-primary" />
+                  <h3 className="mt-4 text-lg font-semibold">{service.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{service.desc}</p>
+                </div>
               );
             })}
           </div>
         </section>
 
-        {/* Works */}
-        <section id="works" className="py-24">
-          <div className="text-center mb-14">
-            <h2 className="text-4xl lg:text-5xl font-bold">My Recent <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">Works</span></h2>
-            <p className="mt-3 text-muted-foreground">A selection of automation workflows I've built.</p>
+        <section id="work" className="py-24">
+          <div className="mb-14 text-center">
+            <h2 className="text-4xl font-bold lg:text-5xl">
+              Selected <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">case studies</span>
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
+              Sanitized examples of the types of operational problems I can help structure and execute. Client-sensitive details are intentionally excluded.
+            </p>
           </div>
-          <div className="grid sm:grid-cols-2 gap-8 [perspective:1500px]">
-            {works.map((w, i) => (
-              <div key={i} className="group relative pt-7">
-                {/* Folder tab */}
-                <div className="absolute top-0 left-6 h-8 w-40 rounded-t-xl bg-gradient-to-br from-accent to-primary shadow-[var(--shadow-glow)] flex items-center gap-2 pl-4 z-0">
+          <div className="grid gap-8 sm:grid-cols-2">
+            {caseStudies.map((work, index) => (
+              <div key={work.title} className="group relative pt-7">
+                <div className="absolute left-6 top-0 z-0 flex h-8 w-40 items-center gap-2 rounded-t-xl bg-gradient-to-br from-accent to-primary pl-4 shadow-[var(--shadow-glow)]">
                   <Folder className="h-4 w-4 text-primary-foreground" />
-                  <span className="text-[11px] font-mono uppercase tracking-wider text-primary-foreground">Project 0{i + 1}</span>
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-primary-foreground">
+                    Case {String(index + 1).padStart(2, "0")}
+                  </span>
                 </div>
-                {/* Folder body */}
-                <div className="relative rounded-2xl rounded-tl-none border border-border bg-card overflow-hidden shadow-[var(--shadow-card)] transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[var(--shadow-glow)] group-hover:border-primary/50 [transform-style:preserve-3d]">
-                  {/* Folder flap (cover) — lifts open on hover */}
-                  <div className="absolute inset-0 z-20 origin-top bg-gradient-to-br from-card via-card to-secondary border-b-2 border-primary/40 transition-transform duration-700 ease-out [transform-style:preserve-3d] group-hover:[transform:rotateX(-110deg)]">
-                    <div className="h-full w-full p-6 flex flex-col justify-between">
-                      <div className="flex items-start justify-between">
-                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">Workflow</span>
-                        <ArrowUpRight className="h-4 w-4 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-lg leading-tight">{w.title}</h3>
-                        <p className="mt-2 text-xs text-muted-foreground">Hover to open folder</p>
-                      </div>
+                <div className="relative overflow-hidden rounded-2xl rounded-tl-none border border-border bg-card shadow-[var(--shadow-card)] transition-all duration-300 group-hover:-translate-y-1 group-hover:border-primary/50">
+                  <div className="aspect-[16/9] overflow-hidden bg-background">
+                    <img src={work.img} alt={work.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold">{work.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{work.desc}</p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {work.tags.map((tag) => (
+                        <span key={tag} className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                          {tag}
+                        </span>
+                      ))}
                     </div>
-                  </div>
-                  {/* Folder contents */}
-                  <div className="aspect-[4/3] overflow-hidden bg-background">
-                    <img src={w.img} alt={w.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                  </div>
-                  <div className="p-5">
-                    <h3 className="font-semibold">{w.title}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">{w.desc}</p>
                   </div>
                 </div>
               </div>
@@ -237,129 +319,114 @@ function Index() {
           </div>
         </section>
 
-        {/* Experience + Education */}
-        <section className="grid lg:grid-cols-2 gap-8 py-24">
-          <div id="experience">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3"><Briefcase className="h-7 w-7 text-primary" /> My Experience</h2>
+        <section id="experience" className="grid gap-8 py-24 lg:grid-cols-2">
+          <div>
+            <h2 className="mb-8 flex items-center gap-3 text-3xl font-bold">
+              <Briefcase className="h-7 w-7 text-primary" /> Experience
+            </h2>
             <div className="space-y-4">
-              {experience.map((e, i) => (
-                <div key={i} className="rounded-2xl border border-border bg-card p-6 hover:border-primary/50 transition">
-                  <span className="inline-block text-xs px-3 py-1 rounded-full bg-primary/10 text-primary font-medium">{e.period}</span>
-                  <h3 className="mt-3 text-lg font-semibold uppercase tracking-wide">{e.title}</h3>
-                  <p className="text-sm text-muted-foreground">{e.org}</p>
-                  <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground list-disc pl-5">
-                    {e.points.map((p, j) => <li key={j}>{p}</li>)}
+              {experience.map((item) => (
+                <div key={item.title} className="rounded-2xl border border-border bg-card p-6 transition hover:border-primary/50">
+                  <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">{item.period}</span>
+                  <h3 className="mt-3 text-lg font-semibold uppercase tracking-wide">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.org}</p>
+                  <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-6 text-muted-foreground">
+                    {item.points.map((point) => (
+                      <li key={point}>{point}</li>
+                    ))}
                   </ul>
                 </div>
               ))}
             </div>
           </div>
-          <div id="education">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3"><GraduationCap className="h-7 w-7 text-primary" /> My Education</h2>
-            <div className="space-y-4">
-              {education.map((e, i) => (
-                <div key={i} className="rounded-2xl border border-border bg-card p-6 hover:border-primary/50 transition">
-                  <span className="inline-block text-xs px-3 py-1 rounded-full bg-primary/10 text-primary font-medium">{e.period}</span>
-                  <h3 className="mt-3 text-lg font-semibold uppercase tracking-wide">{e.title}</h3>
-                  <p className="text-sm text-muted-foreground">{e.org}</p>
-                </div>
-              ))}
+
+          <div>
+            <h2 className="mb-8 flex items-center gap-3 text-3xl font-bold">
+              <GraduationCap className="h-7 w-7 text-primary" /> Education
+            </h2>
+            <div className="rounded-2xl border border-border bg-card p-6 transition hover:border-primary/50">
+              <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">2022 – 2026</span>
+              <h3 className="mt-3 text-lg font-semibold uppercase tracking-wide">Bachelor of Secondary Education Major in Science</h3>
+              <p className="text-sm text-muted-foreground">City College of Calamba</p>
             </div>
           </div>
         </section>
 
-        {/* Skills */}
         <section id="skills" className="py-24">
-          <div className="text-center mb-14">
-            <h2 className="text-4xl lg:text-5xl font-bold">My <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">Skills</span></h2>
-            <p className="mt-3 text-muted-foreground">Tools and technologies I work with every day.</p>
+          <div className="mb-14 text-center">
+            <h2 className="text-4xl font-bold lg:text-5xl">
+              Core <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">capabilities</span>
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
+              I avoid arbitrary percentage scores. These are capabilities I can demonstrate through work samples, supervised experience, or practical project work.
+            </p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {skills.map((s, i) => (
-              <div key={i} className="rounded-2xl border border-border bg-card p-6">
-                <div className="flex justify-between mb-3">
-                  <span className="font-medium">{s.name}</span>
-                  <span className="text-primary font-mono text-sm">{s.level}%</span>
-                </div>
-                <div className="h-2 rounded-full bg-secondary overflow-hidden">
-                  <div className="h-full rounded-full bg-gradient-to-r from-accent to-primary" style={{ width: `${s.level}%` }} />
-                </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {capabilities.map((capability) => (
+              <div key={capability} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-5">
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-primary" />
+                <span className="text-sm font-medium">{capability}</span>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Testimonials */}
-        <section id="testimonials" className="py-24">
-          <div className="text-center mb-14">
-            <h2 className="text-4xl lg:text-5xl font-bold">Client <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">Stories</span></h2>
-            <p className="mt-3 text-muted-foreground">What colleagues and mentors say about working with me.</p>
+        <section id="principles" className="py-24">
+          <div className="mb-14 text-center">
+            <h2 className="text-4xl font-bold lg:text-5xl">
+              How I <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">work</span>
+            </h2>
           </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            {[
-              {
-                name: "Mary Joy A. Capsa",
-                role: "Lead Accountant, SGL Business Outsourcing OPC",
-                initials: "MJ",
-                quote: "Edmon was a great help to our company as an Assistant Bookkeeper. He diligently recorded expenses, sales, and imports, and carefully analyzed invoices and receipts to produce accurate reports. His work ethic and attention to detail truly stood out — dependable, thorough, and always willing to go the extra mile.",
-              },
-              {
-                name: "Mark Anthony M. Balisi",
-                role: "Cooperating Teacher, Punta Integrated School",
-                initials: "MA",
-                quote: "Edmon was a very great student teacher during his internship as a pre-service high school science teacher. He is incredibly teachable, open to criticism, and always acknowledges his shortcomings. He consistently strives to deliver the best work he can — a rare and admirable trait in a young educator.",
-              },
-            ].map((t, i) => (
-              <div key={i} className="rounded-2xl border border-border bg-card p-8 shadow-[var(--shadow-card)]">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-accent to-primary grid place-items-center font-display font-bold text-primary-foreground text-sm">{t.initials}</div>
-                  <div>
-                    <div className="font-semibold">{t.name}</div>
-                    <div className="text-xs text-muted-foreground">{t.role}</div>
-                  </div>
+          <div className="grid gap-5 md:grid-cols-3">
+            {principles.map((principle) => {
+              const Icon = principle.icon;
+              return (
+                <div key={principle.title} className="rounded-2xl border border-border bg-card p-6">
+                  <Icon className="h-6 w-6 text-primary" />
+                  <h3 className="mt-4 font-semibold">{principle.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{principle.desc}</p>
                 </div>
-                <p className="text-sm text-muted-foreground italic">"{t.quote}"</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 
-        {/* Contact */}
         <section id="contact" className="py-24">
-          <div className="rounded-3xl border border-border bg-card p-8 lg:p-12 shadow-[var(--shadow-card)]">
-            <div className="grid lg:grid-cols-2 gap-12">
+          <div className="rounded-3xl border border-border bg-card p-8 shadow-[var(--shadow-card)] lg:p-12">
+            <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-center">
               <div>
-                <h2 className="text-4xl lg:text-5xl font-bold">Let's work <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">together!</span></h2>
-                <p className="mt-4 text-muted-foreground max-w-md">Have a workflow you want to automate? Let's talk about how I can help streamline your operations.</p>
-                <div className="mt-8 space-y-4 text-sm">
-                  <div className="flex items-center gap-3"><Phone className="h-4 w-4 text-primary" /> 09565806996</div>
-                  <div className="flex items-center gap-3"><Mail className="h-4 w-4 text-primary" /> edmon.capsa5@gmail.com</div>
-                  <div className="flex items-center gap-3"><MapPin className="h-4 w-4 text-primary" /> Laguna, Philippines</div>
-                  <div className="flex items-center gap-3"><Linkedin className="h-4 w-4 text-primary" />
-                    <a className="hover:text-primary" href="https://www.linkedin.com/in/edmon-capsa-21523a40a" target="_blank" rel="noreferrer">LinkedIn</a>
-                  </div>
+                <h2 className="text-4xl font-bold lg:text-5xl">
+                  Need reliable <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">operations support?</span>
+                </h2>
+                <p className="mt-4 max-w-2xl text-muted-foreground">
+                  I am open to remote Operations VA, Administrative VA, data-support, research, documentation, and accounting-support opportunities where careful execution and clear communication matter.
+                </p>
+              </div>
+              <div className="space-y-4 text-sm">
+                <a href="mailto:edmon.capsa5@gmail.com" className="flex items-center gap-3 rounded-xl border border-border p-4 transition hover:border-primary hover:text-primary">
+                  <Mail className="h-4 w-4 text-primary" /> edmon.capsa5@gmail.com
+                </a>
+                <a
+                  href="https://www.linkedin.com/in/edmon-capsa-21523a40a"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-3 rounded-xl border border-border p-4 transition hover:border-primary hover:text-primary"
+                >
+                  <Linkedin className="h-4 w-4 text-primary" /> LinkedIn
+                </a>
+                <div className="flex items-center gap-3 rounded-xl border border-border p-4">
+                  <MapPin className="h-4 w-4 text-primary" /> Laguna, Philippines • Remote
                 </div>
               </div>
-              <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <input className="w-full rounded-xl border border-border bg-input/30 px-4 py-3 text-sm outline-none focus:border-primary transition" placeholder="Your Name" />
-                  <input className="w-full rounded-xl border border-border bg-input/30 px-4 py-3 text-sm outline-none focus:border-primary transition" placeholder="Your Email" />
-                </div>
-                <input className="w-full rounded-xl border border-border bg-input/30 px-4 py-3 text-sm outline-none focus:border-primary transition" placeholder="Subject" />
-                <textarea rows={5} className="w-full rounded-xl border border-border bg-input/30 px-4 py-3 text-sm outline-none focus:border-primary transition resize-none" placeholder="Your Message" />
-                <button type="submit" className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-accent to-primary px-7 py-3 font-medium text-primary-foreground shadow-[var(--shadow-glow)] hover:opacity-90 transition">
-                  Send Message <Send className="h-4 w-4" />
-                </button>
-              </form>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-border/50 mt-12">
-        <div className="mx-auto max-w-7xl px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer className="mt-12 border-t border-border/50">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-8 sm:flex-row">
           <Logo />
-          <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Edmon A. Capsa. All rights reserved.</p>
+          <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Edmon A. Capsa. Portfolio work is sanitized where needed.</p>
         </div>
       </footer>
     </div>
