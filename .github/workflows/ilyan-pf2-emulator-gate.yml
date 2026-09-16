@@ -13,214 +13,37 @@ jobs:
   mgba-runtime-gate:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
-    env:
-      EXPECTED_ROM_SHA256: 5231a2c77b679dc4e61cb2b4c5284adafa8a1313ce8b4bd50709d149cd3bbfb2
-      EXPECTED_ROM_SIZE: '524288'
-      DISPLAY: ':99'
-      LIBGL_ALWAYS_SOFTWARE: '1'
-      QT_XCB_GL_INTEGRATION: none
-      QT_QPA_PLATFORM: xcb
     steps:
       - name: Checkout PF2 gate branch
         uses: actions/checkout@v4
 
-      - name: Reconstruct and verify exact PF2 ROM
-        shell: bash
+      - name: Install headless X11, window manager, mGBA runtime dependencies, and QA tools
         run: |
-          set -euo pipefail
-          mkdir -p runtime_artifacts
-          cat ilyan_pf2_emulator_gate/rom.b64.part* \
-            | tr -d '\r\n' \
-            | base64 -d \
-            | xz -dc > PF2.gba
-          printf '%s  PF2.gba\n' "$EXPECTED_ROM_SHA256" | sha256sum -c -
-          actual_size="$(stat -c%s PF2.gba)"
-          test "$actual_size" = "$EXPECTED_ROM_SIZE"
-          sha256sum PF2.gba | tee runtime_artifacts/rom_sha256.txt
-          stat PF2.gba | tee runtime_artifacts/rom_stat.txt
-
-      - name: Install headless runtime tools
-        shell: bash
-        run: |
-          set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            curl ca-certificates xz-utils xvfb xdotool imagemagick ffmpeg fluxbox \
-            libgl1 libegl1 libxkbcommon-x11-0 libxcb-xinerama0 libfuse2t64
+            xvfb openbox xdotool scrot python3-pil xz-utils wget ca-certificates \
+            libegl1 libgl1 libxkbcommon-x11-0 libxcb-cursor0 libxcb-xinerama0 libfuse2t64
 
       - name: Download official mGBA 0.10.5 x64 AppImage
-        shell: bash
         run: |
-          set -euo pipefail
-          curl -fL --retry 4 --retry-delay 2 \
-            -o mgba.appimage \
+          wget -q --show-progress -O mgba.appimage \
             https://github.com/mgba-emu/mgba/releases/download/0.10.5/mGBA-0.10.5-appimage-x64.appimage
           chmod +x mgba.appimage
           ./mgba.appimage --appimage-extract >/dev/null
           test -x squashfs-root/AppRun
-          ./squashfs-root/AppRun --version 2>&1 | tee runtime_artifacts/mgba_version.txt || true
+          echo "MGBA_BIN=$PWD/squashfs-root/AppRun" >> "$GITHUB_ENV"
 
-      - name: Boot PF2 in real mGBA and exercise controls
-        shell: bash
-        run: |
-          set -euo pipefail
+      - name: Run corrected PF2 native framebuffer/input/render gate
+        run: bash ilyan_pf2_emulator_gate/run_gate_software.sh
 
-          Xvfb :99 -screen 0 1024x768x24 -nolisten tcp >runtime_artifacts/xvfb.log 2>&1 &
-          XVFB_PID=$!
-          sleep 1
-          fluxbox >runtime_artifacts/fluxbox.log 2>&1 &
-          FLUX_PID=$!
-          sleep 1
-
-          ./squashfs-root/AppRun "$(pwd)/PF2.gba" >runtime_artifacts/mgba_stdout.log 2>runtime_artifacts/mgba_stderr.log &
-          MGBA_PID=$!
-
-          cleanup() {
-            kill "$MGBA_PID" 2>/dev/null || true
-            kill "$FLUX_PID" 2>/dev/null || true
-            kill "$XVFB_PID" 2>/dev/null || true
-          }
-          trap cleanup EXIT
-
-          # Wait up to 30s for an mGBA window.
-          WIN=''
-          for _ in $(seq 1 120); do
-            if ! kill -0 "$MGBA_PID" 2>/dev/null; then
-              echo 'mGBA exited before creating a window' >&2
-              cat runtime_artifacts/mgba_stderr.log >&2 || true
-              exit 1
-            fi
-            WIN="$(xdotool search --onlyvisible --name 'mGBA' 2>/dev/null | head -n1 || true)"
-            if [ -n "$WIN" ]; then break; fi
-            sleep 0.25
-          done
-          test -n "$WIN"
-          echo "$WIN" > runtime_artifacts/window_id.txt
-          xdotool windowfocus --sync "$WIN"
-          sleep 2
-
-          # Keep a video of the entire real-emulator interaction for motion review.
-          ffmpeg -y -hide_banner -loglevel warning \
-            -f x11grab -framerate 30 -video_size 1024x768 -i :99 \
-            -t 28 -c:v libx264 -preset ultrafast -crf 22 \
-            runtime_artifacts/pf2_runtime_capture.mp4 >runtime_artifacts/ffmpeg.log 2>&1 &
-          FFMPEG_PID=$!
-
-          snap() {
-            local name="$1"
-            import -display :99 -window "$WIN" "runtime_artifacts/${name}.png"
-            identify "runtime_artifacts/${name}.png" >> runtime_artifacts/image_identify.txt
-          }
-
-          tap() {
-            local key="$1"; local delay="${2:-0.10}"
-            xdotool key --window "$WIN" "$key"
-            sleep "$delay"
-          }
-
-          hold() {
-            local key="$1"; local seconds="$2"
-            xdotool keydown --window "$WIN" "$key"
-            sleep "$seconds"
-            xdotool keyup --window "$WIN" "$key"
-          }
-
-          snap 00_boot
-
-          # Movement: acceleration -> cruise -> stop -> reverse.
-          hold Right 1.20
-          snap 01_run_right
-          sleep 0.40
-          snap 02_stop
-          hold Left 0.90
-          snap 03_reverse_left
-
-          # Return toward opponent and exercise the real action controls.
-          hold Right 0.55
-          tap x 0.10
-          tap x 0.12
-          tap x 0.20
-          snap 04_combo
-
-          tap z 0.18
-          snap 05_quick_step
-
-          hold Up 0.22
-          sleep 0.18
-          tap x 0.12
-          snap 06_jump_attack
-
-          # Guard/intercept input path (GBA R = keyboard s in mGBA defaults).
-          hold s 0.55
-          snap 07_guard
-          for delay in 0.18 0.22 0.26 0.30 0.34; do
-            sleep "$delay"
-            tap s 0.05
-          done
-          tap x 0.12
-          snap 08_intercept_redirect_scan
-
-          # Dalum technique: GBA L + A = keyboard a + x.
-          xdotool keydown --window "$WIN" a
-          xdotool key --window "$WIN" x
-          xdotool keyup --window "$WIN" a
-          sleep 0.25
-          snap 09_dalum
-
-          # Debug contact markers: GBA Start = Return.
-          tap Return 0.15
-          tap x 0.10
-          snap 10_debug_contact
-
-          # Randomized runtime soak. Never treat this as feel certification; it is a crash/state/liveness gate.
-          keys=(Left Right x z Up s)
-          for i in $(seq 1 180); do
-            k="${keys[$((RANDOM % ${#keys[@]}))]}"
-            case "$k" in
-              Left|Right|s) hold "$k" 0.05 ;;
-              *) tap "$k" 0.03 ;;
-            esac
-          done
-          snap 11_post_soak
-
-          kill -0 "$MGBA_PID"
-
-          wait "$FFMPEG_PID" || true
-
-          # Runtime liveness: require multiple distinct captured game states.
-          sha256sum runtime_artifacts/*.png | sort -k1,1 > runtime_artifacts/screenshot_sha256.txt
-          unique_frames="$(cut -d' ' -f1 runtime_artifacts/screenshot_sha256.txt | sort -u | wc -l)"
-          echo "unique_screenshot_hashes=$unique_frames" | tee runtime_artifacts/liveness.txt
-          test "$unique_frames" -ge 7
-
-          # Reject a black/unrendered boot capture.
-          mean="$(convert runtime_artifacts/00_boot.png -colorspace Gray -format '%[fx:mean]' info:)"
-          echo "boot_mean_luma=$mean" | tee -a runtime_artifacts/liveness.txt
-          awk -v m="$mean" 'BEGIN { exit !(m > 0.01) }'
-
-          # The GUI must remain alive and logs must not show common fatal/crash signatures.
-          if grep -Eai '(segmentation fault|assertion failed|fatal error|core dumped|stack smashing)' \
-              runtime_artifacts/mgba_stdout.log runtime_artifacts/mgba_stderr.log; then
-            echo 'Fatal/crash signature found in mGBA runtime logs' >&2
-            exit 1
-          fi
-
-          {
-            echo "PF2 REAL mGBA RUNTIME GATE"
-            echo "ROM_SHA256=$EXPECTED_ROM_SHA256"
-            echo "ROM_SIZE=$EXPECTED_ROM_SIZE"
-            echo "UNIQUE_SCREENSHOTS=$unique_frames"
-            echo "MGBA_PROCESS_ALIVE_AFTER_INPUT_SOAK=PASS"
-            echo "BLACK_FRAME_REJECTION=PASS"
-            echo "FATAL_LOG_SCAN=PASS"
-            echo "NOTE=Runtime/controls/rendering gate only; subjective game feel still requires human acceptance."
-          } | tee runtime_artifacts/PF2_RUNTIME_GATE_REPORT.txt
-
-      - name: Upload real-emulator evidence
+      - name: Upload corrected real-emulator evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ilyan-pf2-real-mgba-runtime-evidence
-          path: runtime_artifacts/
-          if-no-files-found: error
+          name: ilyan-pf2-corrected-real-mgba-runtime-evidence
+          path: |
+            screenshots_native/
+            screenshots_window/
+            results/
+          if-no-files-found: warn
           retention-days: 14
