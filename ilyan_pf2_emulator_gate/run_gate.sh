@@ -24,8 +24,11 @@ fi
 export DISPLAY=:99
 Xvfb :99 -screen 0 1280x960x24 > results/xvfb.log 2>&1 &
 XVFB_PID=$!
-trap 'kill ${MGBA_PID:-0} ${XVFB_PID:-0} 2>/dev/null || true' EXIT
-sleep 1
+sleep 0.6
+openbox > results/openbox.log 2>&1 &
+OPENBOX_PID=$!
+trap 'kill ${MGBA_PID:-0} ${OPENBOX_PID:-0} ${XVFB_PID:-0} 2>/dev/null || true' EXIT
+sleep 0.7
 
 EMU="${MGBA_BIN:-}"
 if [[ -z "$EMU" ]]; then
@@ -41,24 +44,65 @@ cat results/mgba_version.txt
 "$EMU" -2 -l 127 results/pf2.gba > results/mgba.log 2>&1 &
 MGBA_PID=$!
 
+# Select the real top-level emulator window. Qt creates tiny helper windows too,
+# so taking the first/last XID is unsafe. Require a credible gameplay-sized window
+# and choose the largest visible candidate.
 WIN=''
-for i in $(seq 1 120); do
-  WIN="$(xdotool search --pid "$MGBA_PID" 2>/dev/null | tail -n1 || true)"
-  if [[ -z "$WIN" ]]; then
-    WIN="$(xdotool search --name 'mGBA' 2>/dev/null | tail -n1 || true)"
+BEST_AREA=0
+: > results/window_candidates.txt
+for i in $(seq 1 150); do
+  BEST=''
+  BEST_AREA=0
+  {
+    xdotool search --pid "$MGBA_PID" 2>/dev/null || true
+    xdotool search --name 'mGBA' 2>/dev/null || true
+  } | sort -u > results/window_candidates_current.txt
+
+  while IFS= read -r cand; do
+    [[ -z "$cand" ]] && continue
+    geo="$(xdotool getwindowgeometry --shell "$cand" 2>/dev/null || true)"
+    w="$(printf '%s\n' "$geo" | awk -F= '/^WIDTH=/{print $2}')"
+    h="$(printf '%s\n' "$geo" | awk -F= '/^HEIGHT=/{print $2}')"
+    x="$(printf '%s\n' "$geo" | awk -F= '/^X=/{print $2}')"
+    y="$(printf '%s\n' "$geo" | awk -F= '/^Y=/{print $2}')"
+    printf '%s width=%s height=%s x=%s y=%s\n' "$cand" "${w:-?}" "${h:-?}" "${x:-?}" "${y:-?}" >> results/window_candidates.txt
+    if [[ "${w:-}" =~ ^[0-9]+$ && "${h:-}" =~ ^[0-9]+$ ]]; then
+      area=$((w*h))
+      if (( w >= 200 && h >= 150 && area > BEST_AREA )); then
+        BEST="$cand"
+        BEST_AREA="$area"
+      fi
+    fi
+  done < results/window_candidates_current.txt
+
+  if [[ -n "$BEST" ]]; then
+    WIN="$BEST"
+    break
   fi
-  [[ -n "$WIN" ]] && break
   sleep 0.1
 done
+
 if [[ -z "$WIN" ]]; then
-  echo 'No mGBA window found' >&2
-  cat results/mgba.log || true
+  echo 'No credible mGBA gameplay window found' >&2
+  cat results/window_candidates.txt >&2 || true
+  cat results/mgba.log >&2 || true
   exit 3
 fi
 
 echo "$WIN" > results/window_id.txt
 xdotool getwindowgeometry --shell "$WIN" | tee results/window_geometry.txt
+xdotool windowmap "$WIN" 2>/dev/null || true
+xdotool windowactivate --sync "$WIN" 2>/dev/null || true
 sleep 0.8
+
+# Require sane dimensions before any screenshot/input test.
+WIN_GEO="$(xdotool getwindowgeometry --shell "$WIN")"
+WIN_W="$(printf '%s\n' "$WIN_GEO" | awk -F= '/^WIDTH=/{print $2}')"
+WIN_H="$(printf '%s\n' "$WIN_GEO" | awk -F= '/^HEIGHT=/{print $2}')"
+if ! [[ "$WIN_W" =~ ^[0-9]+$ && "$WIN_H" =~ ^[0-9]+$ ]] || (( WIN_W < 200 || WIN_H < 150 )); then
+  echo "Invalid emulator window geometry: ${WIN_W}x${WIN_H}" >&2
+  exit 4
+fi
 
 shot() {
   local name="$1"
@@ -165,6 +209,7 @@ for p in files:
     lum=[(r*299+g*587+b*114)/1000 for r,g,b in pix]
     rows.append({'file':p.name,'size':list(im.size),'unique_colors':len(colors),'luma_mean':round(statistics.fmean(lum),2),'luma_stdev':round(statistics.pstdev(lum),2),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
 assert len(rows)>=24, f'only {len(rows)} screenshots'
+assert all(r['size'][0] >= 200 and r['size'][1] >= 150 for r in rows), rows
 assert all(r['unique_colors']>40 for r in rows), rows
 assert all(r['luma_stdev']>5 for r in rows), rows
 boot=thumbs['00_boot.png']
