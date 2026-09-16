@@ -30,7 +30,7 @@ jobs:
           test -x squashfs-root/AppRun
           echo "MGBA_BIN=$PWD/squashfs-root/AppRun" >> "$GITHUB_ENV"
       - name: Run real mGBA runtime/input/render gate
-        run: bash ilyan_pf2_emulator_gate/run_gate.sh
+        run: bash ilyan_pf2_emulator_gate/run_gate_software.sh
       - name: Upload runtime evidence
         if: always()
         uses: actions/upload-artifact@v4
