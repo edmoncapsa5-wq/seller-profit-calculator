@@ -1,0 +1,39 @@
+name: Ilyan PF2 mGBA runtime gate
+
+on:
+  push:
+    branches: [ilyan-pf2-emulator-gate]
+    paths:
+      - 'ilyan_pf2_emulator_gate/**'
+      - '.github/workflows/ilyan-pf2-emulator.yml'
+  workflow_dispatch:
+
+jobs:
+  mgba-runtime-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install headless X11 and QA tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb xdotool scrot python3-pil xz-utils wget
+      - name: Download official mGBA 0.10.5 x64 AppImage
+        run: |
+          wget -q --show-progress -O mgba.appimage \
+            https://github.com/mgba-emu/mgba/releases/download/0.10.5/mGBA-0.10.5-appimage-x64.appimage
+          chmod +x mgba.appimage
+          ./mgba.appimage --appimage-extract >/dev/null
+          test -x squashfs-root/AppRun
+          echo "MGBA_BIN=$PWD/squashfs-root/AppRun" >> "$GITHUB_ENV"
+      - name: Run real mGBA runtime/input/render gate
+        run: bash ilyan_pf2_emulator_gate/run_gate.sh
+      - name: Upload runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ilyan-pf2-mgba-runtime-evidence
+          path: |
+            screenshots/
+            results/
+          if-no-files-found: warn
