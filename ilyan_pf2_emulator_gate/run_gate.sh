@@ -70,10 +70,10 @@ key_down(){ xdotool keydown --window "$WIN" "$1"; }
 key_up(){ xdotool keyup --window "$WIN" "$1"; }
 key_tap(){ xdotool key --window "$WIN" "$1"; }
 
-# F12 is mGBA's own Take Screenshot shortcut. These screenshots come from the
-# emulated framebuffer itself and therefore bypass X11/OpenGL compositor capture.
 native_shot() {
-  local name="$1" marker="results/.shot_marker_${name}" newest=''
+  local name="$1"
+  local marker="results/.shot_marker_${name}"
+  local newest=''
   touch "$marker"
   key_tap F12
   for _ in $(seq 1 40); do
@@ -86,7 +86,6 @@ native_shot() {
   cp "$newest" "screenshots_native/${name}.png"
 }
 
-# Keep one X11 capture as a diagnostic only; it is NOT used for render acceptance.
 window_shot() {
   local name="$1" geo x y w h
   geo="$(xdotool getwindowgeometry --shell "$WIN")"
@@ -103,7 +102,6 @@ key_down Right; sleep 0.10; native_shot 01_accel; sleep 0.35; native_shot 02_cru
 sleep 0.10; native_shot 03_stop
 key_down Left; sleep 0.12; native_shot 04_reverse; sleep 0.20; key_up Left; native_shot 05_reverse_release
 
-# Select resets the PF2 test state by design.
 key_tap BackSpace; sleep 0.25; native_shot 06_reset
 
 key_down Right; sleep 0.12; key_tap z; sleep 0.05; native_shot 07_quick_early; sleep 0.09; native_shot 08_quick_late; key_up Right
@@ -140,14 +138,12 @@ for p in files:
     colors=im.getcolors(maxcolors=10_000_000) or []
     pix=list(thumb.getdata()); lum=[(r*299+g*587+b*114)/1000 for r,g,b in pix]
     rows.append({'file':p.name,'size':list(im.size),'unique_colors':len(colors),'luma_mean':round(statistics.fmean(lum),2),'luma_stdev':round(statistics.pstdev(lum),2),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
-# mGBA's own screenshots for GBA must be the native 240x160 framebuffer.
 assert all(r['size']==[240,160] for r in rows), rows
 assert all(r['unique_colors']>40 for r in rows), rows
 assert all(r['luma_stdev']>5 for r in rows), rows
 assert len(set(r['sha256'] for r in rows)) >= 12, 'too few distinct emulated frames'
 boot=thumbs['00_boot.png']
-def mad(a,b):
-    return sum(ImageStat.Stat(ImageChops.difference(a,b)).mean)/3
+def mad(a,b): return sum(ImageStat.Stat(ImageChops.difference(a,b)).mean)/3
 probe=['02_cruise.png','04_reverse.png','07_quick_early.png','10_attack1.png','12_attack3.png','14_guard.png','17_dalum.png','18_debug_contact.png','19_soak.png']
 change={n:round(mad(boot,thumbs[n]),3) for n in probe}
 assert max(change.values())>1.5, change
