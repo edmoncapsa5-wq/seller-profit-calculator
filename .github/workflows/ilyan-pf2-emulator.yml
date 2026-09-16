@@ -15,11 +15,11 @@ jobs:
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
-      - name: Install headless X11, mGBA runtime dependencies, and QA tools
+      - name: Install headless X11, window manager, mGBA runtime dependencies, and QA tools
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            xvfb xdotool scrot python3-pil xz-utils wget ca-certificates \
+            xvfb openbox xdotool scrot python3-pil xz-utils wget ca-certificates \
             libegl1 libgl1 libxkbcommon-x11-0 libxcb-cursor0 libxcb-xinerama0 libfuse2t64
       - name: Download official mGBA 0.10.5 x64 AppImage
         run: |
