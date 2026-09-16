@@ -2,7 +2,16 @@
 set -euo pipefail
 mkdir -p screenshots results
 
-cat ilyan_pf2_emulator_gate/rom.b64.part0{0,1,2,3,4,5,6,7} | base64 -d > results/pf2.gba.xz
+cat \
+  ilyan_pf2_emulator_gate/rom.b64.part00 \
+  pf2_chunks_fix/part01_0 pf2_chunks_fix/part01_1 pf2_chunks_fix/part01_2 pf2_chunks_fix/part01_3 \
+  ilyan_pf2_emulator_gate/rom.b64.part02 \
+  ilyan_pf2_emulator_gate/rom.b64.part03 \
+  ilyan_pf2_emulator_gate/rom.b64.part04 \
+  ilyan_pf2_emulator_gate/rom.b64.part05 \
+  ilyan_pf2_emulator_gate/rom.b64.part06 \
+  ilyan_pf2_emulator_gate/rom.b64.part07 \
+  | base64 -d > results/pf2.gba.xz
 xz -dc results/pf2.gba.xz > results/pf2.gba
 EXPECTED_SHA='5231a2c77b679dc4e61cb2b4c5284adafa8a1313ce8b4bd50709d149cd3bbfb2'
 ACTUAL_SHA="$(sha256sum results/pf2.gba | awk '{print $1}')"
