@@ -37,6 +37,7 @@ jobs:
         with:
           name: ilyan-pf2-mgba-runtime-evidence
           path: |
-            screenshots/
+            screenshots_native/
+            screenshots_window/
             results/
           if-no-files-found: warn
