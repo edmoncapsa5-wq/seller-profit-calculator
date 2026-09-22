@@ -1,0 +1,91 @@
+name: Finance Tracker v0.7 Build
+
+on:
+  push:
+    branches: [ finance-tracker-ci-20260922-v07 ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Configure Android SDK
+        shell: bash
+        run: |
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platform-tools" "platforms;android-37.0" "build-tools;36.0.0"
+          if [ -d "$ANDROID_HOME/platforms/android-37.0" ] && [ ! -e "$ANDROID_HOME/platforms/android-37" ]; then
+            ln -s "$ANDROID_HOME/platforms/android-37.0" "$ANDROID_HOME/platforms/android-37"
+          fi
+
+      - name: Set up Gradle 9.6.0
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.6.0'
+
+      - name: Reassemble v0.6 bridge source
+        shell: bash
+        run: |
+          cat payload_v06/part_* | tr -d '\n\r' | base64 -d > cashflow-v06-stable-src.tar.gz
+          echo "0fc37309f15cc5319d76a492b4222a33ec2de12c094b2e8213624ddaf36b140a  cashflow-v06-stable-src.tar.gz" | sha256sum -c -
+          tar -xzf cashflow-v06-stable-src.tar.gz
+          grep -n 'versionName = "0.6.1-stable"' finance-tracker-v0.6-stable/app/build.gradle.kts
+
+      - name: Build v0.6 bridge
+        working-directory: finance-tracker-v0.6-stable
+        run: gradle assembleDebug --stacktrace
+
+      - name: Reassemble v0.7 source
+        shell: bash
+        run: |
+          cat payload_v07/part_* | tr -d '\n\r' | base64 -d > cashflow-v07-src.tar.gz
+          echo "96071166ecf6d3904025f7eac4ed1bf5cc3e95d3c495f29df5fe197a5a5fc546  cashflow-v07-src.tar.gz" | sha256sum -c -
+          tar -xzf cashflow-v07-src.tar.gz
+          grep -n 'versionName = "0.7.0"' finance-tracker-v0.7/app/build.gradle.kts
+          grep -n 'createCreditCardAccount' finance-tracker-v0.7/app/src/main/java/com/capsawise/cashflow/data/LedgerRepository.kt
+          grep -n 'createLoanPayment' finance-tracker-v0.7/app/src/main/java/com/capsawise/cashflow/data/LedgerRepository.kt
+
+      - name: Unit tests v0.7
+        working-directory: finance-tracker-v0.7
+        run: gradle testDebugUnitTest --stacktrace
+
+      - name: Build v0.7
+        working-directory: finance-tracker-v0.7
+        run: gradle assembleDebug --stacktrace
+
+      - name: Prepare artifacts and signing tool
+        shell: bash
+        run: |
+          mkdir -p output/tools
+          cp finance-tracker-v0.6-stable/app/build/outputs/apk/debug/app-debug.apk output/CashFlow-v0.6-stable-bridge-unsigned.apk
+          cp finance-tracker-v0.7/app/build/outputs/apk/debug/app-debug.apk output/CashFlow-v0.7-unsigned.apk
+          cp "$ANDROID_HOME/build-tools/36.0.0/lib/apksigner.jar" output/tools/apksigner.jar
+          test -s output/CashFlow-v0.6-stable-bridge-unsigned.apk
+          test -s output/CashFlow-v0.7-unsigned.apk
+          test -s output/tools/apksigner.jar
+          sha256sum output/CashFlow-v0.6-stable-bridge-unsigned.apk
+          sha256sum output/CashFlow-v0.7-unsigned.apk
+          sha256sum output/tools/apksigner.jar
+
+      - name: Upload build bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: finance-tracker-v0.7-build-bundle
+          path: output/
+          compression-level: 0
