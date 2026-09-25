@@ -1,0 +1,84 @@
+name: Finance Tracker Stable APK
+
+on:
+  push:
+    branches: [ finance-tracker-ci-stable ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+    steps:
+      - name: Checkout isolated build branch
+        uses: actions/checkout@v4
+
+      - name: Restore stable debug signing key
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: finance-tracker-stable-debug-key-v1
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Configure Android SDK
+        shell: bash
+        run: |
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platform-tools" "platforms;android-37.0" "build-tools;36.0.0"
+          if [ -d "$ANDROID_HOME/platforms/android-37.0" ] && [ ! -e "$ANDROID_HOME/platforms/android-37" ]; then
+            ln -s "$ANDROID_HOME/platforms/android-37.0" "$ANDROID_HOME/platforms/android-37"
+          fi
+
+      - name: Set up Gradle 9.6.0
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.6.0'
+
+      - name: Reassemble verified v0.7 source
+        shell: bash
+        run: |
+          cat payload/part_* | tr -d '\n\r' | base64 -d > finance-tracker-v0.7-src.tar.gz
+          echo "1f142566717f4be1172e6df37f8e70cfe7821cc76584c8bd86c197ba635596fc  finance-tracker-v0.7-src.tar.gz" | sha256sum -c -
+          tar -xzf finance-tracker-v0.7-src.tar.gz
+          grep -n 'versionName = "0.7.0"' finance-tracker-v0.7/app/build.gradle.kts
+          grep -n 'version = 3' finance-tracker-v0.7/app/src/main/java/com/capsawise/cashflow/data/db/FinanceDatabase.kt
+          grep -n 'AccountRole.CREDIT_CARD' finance-tracker-v0.7/app/src/main/java/com/capsawise/cashflow/ui/CashFlowApp.kt | head
+
+      - name: Unit tests
+        working-directory: finance-tracker-v0.7
+        run: gradle testDebugUnitTest --stacktrace
+
+      - name: Build debug APK
+        working-directory: finance-tracker-v0.7
+        run: gradle assembleDebug --stacktrace
+
+      - name: Verify APK and signing certificate
+        shell: bash
+        run: |
+          APK="finance-tracker-v0.7/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+          sha256sum "$APK" | tee apk-sha256.txt
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs "$APK" | tee signing-cert.txt
+          sha256sum "$HOME/.android/debug.keystore" | tee keystore-sha256.txt
+
+      - name: Upload APK and verification
+        uses: actions/upload-artifact@v4
+        with:
+          name: finance-tracker-v0.7-stable-debug-apk
+          path: |
+            finance-tracker-v0.7/app/build/outputs/apk/debug/app-debug.apk
+            apk-sha256.txt
+            signing-cert.txt
+            keystore-sha256.txt
+          compression-level: 0
