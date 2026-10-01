@@ -96,8 +96,10 @@ jobs:
             finance-tracker-v0.9.1/app/src/main/java/com/capsawise/cashflow/domain/Ledger.kt \
             finance-tracker-v0.9.1/app/src/main/java/com/capsawise/cashflow/domain/Reports.kt \
             finance-tracker-v0.9.1/app/src/main/java/com/capsawise/cashflow/data/LedgerRepository.kt; do
-            if grep -nE '\b(Float|Double)\b' "$file"; then
-              echo "Floating point type found in money-critical source: $file" >&2
+            matches="$(grep -nE '\b(Float|Double)\b' "$file" | grep -vE '^[0-9]+:[[:space:]]*(//|/\*|\*)' || true)"
+            if [ -n "$matches" ]; then
+              echo "$matches"
+              echo "Floating point type found in money-critical executable source: $file" >&2
               exit 1
             fi
           done
