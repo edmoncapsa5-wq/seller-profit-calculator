@@ -1,0 +1,230 @@
+name: Cash Flow v0.10 Automated QA Gate
+
+on:
+  push:
+    branches: [ finance-tracker-ci-20261002-v010qa ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  build-and-static:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout isolated QA branch
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Configure Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platform-tools" "platforms;android-37.0" "build-tools;36.0.0"
+          if [ -d "$ANDROID_HOME/platforms/android-37.0" ] && [ ! -e "$ANDROID_HOME/platforms/android-37" ]; then
+            ln -s "$ANDROID_HOME/platforms/android-37.0" "$ANDROID_HOME/platforms/android-37"
+          fi
+
+      - name: Set up Gradle 9.6.0
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.6.0'
+
+      - name: Retrieve verified v0.9.1 source baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p previous-source
+          gh run download 36358910880 \
+            --repo edmoncapsa5-wq/seller-profit-calculator \
+            --name finance-tracker-v0.9.1-source \
+            --dir previous-source
+          test -s previous-source/finance-tracker-android-v0.9.1.zip
+          echo "1b7d229fa7f032f90feed090c0c4ce892b3e6d9cc3e250f24a286e50a3b0558e  previous-source/finance-tracker-android-v0.9.1.zip" | sha256sum -c -
+          unzip -q previous-source/finance-tracker-android-v0.9.1.zip
+          rm -rf finance-tracker-v0.9.1/.gradle finance-tracker-v0.9.1/build finance-tracker-v0.9.1/app/build
+          grep -n 'versionCode = 10' finance-tracker-v0.9.1/app/build.gradle.kts
+          grep -n 'versionName = "0.9.1"' finance-tracker-v0.9.1/app/build.gradle.kts
+          test -s finance-tracker-v0.9.1/app/dev-signing.jks
+
+      - name: Build previous signed APK for upgrade proof
+        working-directory: finance-tracker-v0.9.1
+        run: |
+          set -euo pipefail
+          gradle assembleDebug --stacktrace
+          mkdir -p ../qa-artifacts
+          cp app/build/outputs/apk/debug/app-debug.apk ../qa-artifacts/CashFlow-v0.9.1-dev.apk
+
+      - name: Apply v0.10 QA hardening overlay
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat overlay_v010_qa/part_* | tr -d '\n\r' | base64 -d > v010-overlay.tar.gz
+          echo "9d326516d72a76211b9bb75f0cab0baa97e23207c28090e3b8e26aa49f04bd64  v010-overlay.tar.gz" | sha256sum -c -
+          tar -xzf v010-overlay.tar.gz -C finance-tracker-v0.9.1
+          grep -n 'versionCode = 11' finance-tracker-v0.9.1/app/build.gradle.kts
+          grep -n 'versionName = "0.10.0"' finance-tracker-v0.9.1/app/build.gradle.kts
+          grep -n 'oneHundredThousandGeneratedEventsPreserveLedgerInvariants' finance-tracker-v0.9.1/app/src/test/java/com/capsawise/cashflow/domain/LedgerPropertyTest.kt
+          grep -n 'completeAccountingScenarioSurvivesBackupRestoreAndEdits' finance-tracker-v0.9.1/app/src/androidTest/java/com/capsawise/cashflow/data/RepositoryIntegrationTest.kt
+          grep -n 'onboardingExposesCriticalNavigationAndSecurityControls' finance-tracker-v0.9.1/app/src/androidTest/java/com/capsawise/cashflow/ui/CriticalUiSmokeTest.kt
+          grep -n 'contentDescription = "Settings"' finance-tracker-v0.9.1/app/src/main/java/com/capsawise/cashflow/ui/CashFlowApp.kt
+
+      - name: Static financial safety checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          MANIFEST=finance-tracker-v0.9.1/app/src/main/AndroidManifest.xml
+          grep -F 'android:allowBackup="false"' "$MANIFEST"
+          ! grep -F 'android.permission.INTERNET' "$MANIFEST"
+          for file in \
+            finance-tracker-v0.9.1/app/src/main/java/com/capsawise/cashflow/domain/Money.kt \
+            finance-tracker-v0.9.1/app/src/main/java/com/capsawise/cashflow/domain/Ledger.kt \
+            finance-tracker-v0.9.1/app/src/main/java/com/capsawise/cashflow/domain/Reports.kt \
+            finance-tracker-v0.9.1/app/src/main/java/com/capsawise/cashflow/data/LedgerRepository.kt; do
+            if grep -nE '\b(Float|Double)\b' "$file"; then
+              echo "Floating point type found in money-critical source: $file" >&2
+              exit 1
+            fi
+          done
+
+      - name: Verify stable development signing identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          keytool -list -v \
+            -keystore finance-tracker-v0.9.1/app/dev-signing.jks \
+            -storepass cashflow-dev \
+            -alias cashflowdev | grep -F "SHA256: 86:2E:23:C2:F9:9E:27:53:BB:70:A2:F8:D7:FF:17:8E:3D:75:0B:04:4B:DB:86:AA:87:B4:6F:F3:3D:B1:96:F3"
+
+      - name: JVM unit and property tests
+        working-directory: finance-tracker-v0.9.1
+        run: gradle testDebugUnitTest --stacktrace
+
+      - name: Android Lint
+        working-directory: finance-tracker-v0.9.1
+        run: gradle lintDebug --stacktrace
+
+      - name: Build candidate and instrumentation APKs
+        working-directory: finance-tracker-v0.9.1
+        run: gradle assembleDebug assembleDebugAndroidTest --stacktrace
+
+      - name: Verify APK identities and signatures
+        shell: bash
+        run: |
+          set -euo pipefail
+          OLD=qa-artifacts/CashFlow-v0.9.1-dev.apk
+          NEW=finance-tracker-v0.9.1/app/build/outputs/apk/debug/app-debug.apk
+          TEST=finance-tracker-v0.9.1/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+          test -s "$OLD" && test -s "$NEW" && test -s "$TEST"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$OLD" | tee /tmp/old-badging.txt
+          grep -F "package: name='com.capsawise.cashflow.dev' versionCode='10' versionName='0.9.1-dev'" /tmp/old-badging.txt
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$NEW" | tee /tmp/new-badging.txt
+          grep -F "package: name='com.capsawise.cashflow.dev' versionCode='11' versionName='0.10.0-dev'" /tmp/new-badging.txt
+          for apk in "$OLD" "$NEW"; do
+            "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs "$apk" | tee /tmp/certs.txt
+            grep -Fi "862e23c2f99e2753bb70a2f8d7ff178e3d750b044bdb86aa87b46ff33db196f3" /tmp/certs.txt
+          done
+          mkdir -p qa-artifacts
+          cp "$NEW" qa-artifacts/CashFlow-v0.10-dev.apk
+          cp "$TEST" qa-artifacts/CashFlow-v0.10-dev-androidTest.apk
+          sha256sum qa-artifacts/*.apk
+
+      - name: Package sanitized matching source
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp -a finance-tracker-v0.9.1 finance-tracker-v0.10
+          rm -f finance-tracker-v0.10/app/dev-signing.jks
+          rm -rf finance-tracker-v0.10/.gradle finance-tracker-v0.10/build finance-tracker-v0.10/app/build
+          zip -qr finance-tracker-android-v0.10-qa-source.zip finance-tracker-v0.10
+          sha256sum finance-tracker-android-v0.10-qa-source.zip
+
+      - name: Upload QA APK bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: cashflow-v0.10-qa-apks
+          path: qa-artifacts/*.apk
+          compression-level: 0
+
+      - name: Upload candidate APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: cashflow-v0.10-dev-apk
+          path: qa-artifacts/CashFlow-v0.10-dev.apk
+          compression-level: 0
+
+      - name: Upload sanitized source
+        uses: actions/upload-artifact@v4
+        with:
+          name: cashflow-v0.10-qa-source
+          path: finance-tracker-android-v0.10-qa-source.zip
+          compression-level: 0
+
+  emulator-gate:
+    needs: build-and-static
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [29, 35]
+    steps:
+      - name: Download QA APK bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: cashflow-v0.10-qa-apks
+          path: qa-apks
+
+      - name: Enable KVM access
+        shell: bash
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm || true
+
+      - name: Android API ${{ matrix.api-level }} upgrade + integration/UI gate
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          disk-size: 4096M
+          script: |
+            set -euo pipefail
+            OLD="$GITHUB_WORKSPACE/qa-apks/CashFlow-v0.9.1-dev.apk"
+            NEW="$GITHUB_WORKSPACE/qa-apks/CashFlow-v0.10-dev.apk"
+            TEST="$GITHUB_WORKSPACE/qa-apks/CashFlow-v0.10-dev-androidTest.apk"
+
+            adb uninstall com.capsawise.cashflow.dev >/dev/null 2>&1 || true
+            adb uninstall com.capsawise.cashflow.dev.test >/dev/null 2>&1 || true
+
+            echo '--- in-place upgrade proof ---'
+            adb install "$OLD"
+            adb shell "run-as com.capsawise.cashflow.dev sh -c 'mkdir -p files && echo qa-v091 > files/qa-upgrade-marker.txt'"
+            adb install -r "$NEW"
+            MARKER="$(adb shell run-as com.capsawise.cashflow.dev cat files/qa-upgrade-marker.txt | tr -d '\r')"
+            test "$MARKER" = "qa-v091"
+            adb shell dumpsys package com.capsawise.cashflow.dev | grep -E 'versionCode=11([^0-9]|$)'
+
+            echo '--- fresh-install instrumentation suite ---'
+            adb uninstall com.capsawise.cashflow.dev
+            adb install "$NEW"
+            adb install "$TEST"
+            adb shell am instrument -w com.capsawise.cashflow.dev.test/androidx.test.runner.AndroidJUnitRunner | tee instrumentation.txt
+            grep -E '^OK \([0-9]+ tests?\)' instrumentation.txt
