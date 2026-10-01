@@ -208,7 +208,7 @@ jobs:
           disable-animations: true
           disk-size: 4096M
           script: |
-            set -euo pipefail
+            set -eu
             OLD="$GITHUB_WORKSPACE/qa-apks/CashFlow-v0.9.1-dev.apk"
             NEW="$GITHUB_WORKSPACE/qa-apks/CashFlow-v0.10-dev.apk"
             TEST="$GITHUB_WORKSPACE/qa-apks/CashFlow-v0.10-dev-androidTest.apk"
