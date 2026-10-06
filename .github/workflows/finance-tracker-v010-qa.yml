@@ -208,25 +208,19 @@ jobs:
           disable-animations: true
           disk-size: 4096M
           script: |
-            set -eu
-            OLD="$GITHUB_WORKSPACE/qa-apks/CashFlow-v0.9.1-dev.apk"
-            NEW="$GITHUB_WORKSPACE/qa-apks/CashFlow-v0.10-dev.apk"
-            TEST="$GITHUB_WORKSPACE/qa-apks/CashFlow-v0.10-dev-androidTest.apk"
-
             adb uninstall com.capsawise.cashflow.dev >/dev/null 2>&1 || true
             adb uninstall com.capsawise.cashflow.dev.test >/dev/null 2>&1 || true
 
             echo '--- in-place upgrade proof ---'
-            adb install "$OLD"
+            adb install "$GITHUB_WORKSPACE/qa-apks/CashFlow-v0.9.1-dev.apk"
             adb shell "run-as com.capsawise.cashflow.dev sh -c 'mkdir -p files && echo qa-v091 > files/qa-upgrade-marker.txt'"
-            adb install -r "$NEW"
-            MARKER="$(adb shell run-as com.capsawise.cashflow.dev cat files/qa-upgrade-marker.txt | tr -d '\r')"
-            test "$MARKER" = "qa-v091"
+            adb install -r "$GITHUB_WORKSPACE/qa-apks/CashFlow-v0.10-dev.apk"
+            adb shell run-as com.capsawise.cashflow.dev cat files/qa-upgrade-marker.txt | tr -d '\r' | grep -Fx 'qa-v091'
             adb shell dumpsys package com.capsawise.cashflow.dev | grep -E 'versionCode=11([^0-9]|$)'
 
             echo '--- fresh-install instrumentation suite ---'
             adb uninstall com.capsawise.cashflow.dev
-            adb install "$NEW"
-            adb install "$TEST"
+            adb install "$GITHUB_WORKSPACE/qa-apks/CashFlow-v0.10-dev.apk"
+            adb install "$GITHUB_WORKSPACE/qa-apks/CashFlow-v0.10-dev-androidTest.apk"
             adb shell am instrument -w com.capsawise.cashflow.dev.test/androidx.test.runner.AndroidJUnitRunner | tee instrumentation.txt
             grep -E '^OK \([0-9]+ tests?\)' instrumentation.txt
