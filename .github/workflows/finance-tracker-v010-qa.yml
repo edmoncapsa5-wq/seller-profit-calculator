@@ -223,5 +223,9 @@ jobs:
             adb uninstall com.capsawise.cashflow.dev
             adb install "$GITHUB_WORKSPACE/qa-apks/CashFlow-v0.10-dev.apk"
             adb install "$GITHUB_WORKSPACE/qa-apks/CashFlow-v0.10-dev-androidTest.apk"
-            adb shell am instrument -w com.capsawise.cashflow.dev.test/androidx.test.runner.AndroidJUnitRunner | tee instrumentation.txt
-            grep -E '^OK \([0-9]+ tests?\)' instrumentation.txt
+            adb logcat -c
+            adb shell am instrument -w -e class com.capsawise.cashflow.ui.CriticalUiSmokeTest com.capsawise.cashflow.dev.test/androidx.test.runner.AndroidJUnitRunner | tee ui-instrumentation.txt
+            adb logcat -d -v brief | grep -E 'AndroidRuntime|CashFlow|Room|SQLite|sqlcipher|DatabaseProvider|DatabaseKeyManager' | tail -200 || true
+            grep -E '^OK \(1 test\)' ui-instrumentation.txt
+            adb shell am instrument -w -e class com.capsawise.cashflow.data.RepositoryIntegrationTest com.capsawise.cashflow.dev.test/androidx.test.runner.AndroidJUnitRunner | tee repository-instrumentation.txt
+            grep -E '^OK \(2 tests\)' repository-instrumentation.txt
