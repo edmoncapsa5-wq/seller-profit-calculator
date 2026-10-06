@@ -77,6 +77,7 @@ jobs:
           cat overlay_v010_qa/part_* | tr -d '\n\r' | base64 -d > v010-overlay.tar.gz
           echo "9d326516d72a76211b9bb75f0cab0baa97e23207c28090e3b8e26aa49f04bd64  v010-overlay.tar.gz" | sha256sum -c -
           tar -xzf v010-overlay.tar.gz -C finance-tracker-v0.9.1
+          patch -d finance-tracker-v0.9.1 -p1 < qa_patch/ui_wait.patch
           grep -n 'versionCode = 11' finance-tracker-v0.9.1/app/build.gradle.kts
           grep -n 'versionName = "0.10.0"' finance-tracker-v0.9.1/app/build.gradle.kts
           grep -n 'oneHundredThousandGeneratedEventsPreserveLedgerInvariants' finance-tracker-v0.9.1/app/src/test/java/com/capsawise/cashflow/domain/LedgerPropertyTest.kt
