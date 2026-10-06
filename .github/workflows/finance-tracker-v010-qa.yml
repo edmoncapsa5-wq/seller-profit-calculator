@@ -54,7 +54,14 @@ jobs:
             --repo edmoncapsa5-wq/seller-profit-calculator \
             --name finance-tracker-v0.9.1-source \
             --dir previous-source
+          mkdir -p previous-apk
+          gh run download 36358910880 \
+            --repo edmoncapsa5-wq/seller-profit-calculator \
+            --name finance-tracker-v0.9.1-dev-apk \
+            --dir previous-apk
           test -s previous-source/finance-tracker-android-v0.9.1.zip
+          test -s previous-apk/app-debug.apk
+          echo "f2cf1d154a5cf6c8c65a3c8aa65455849a3c6eead32cfe614aaf2ca07d5fa604  previous-apk/app-debug.apk" | sha256sum -c -
           echo "1b7d229fa7f032f90feed090c0c4ce892b3e6d9cc3e250f24a286e50a3b0558e  previous-source/finance-tracker-android-v0.9.1.zip" | sha256sum -c -
           unzip -q previous-source/finance-tracker-android-v0.9.1.zip
           rm -rf finance-tracker-v0.9.1/.gradle finance-tracker-v0.9.1/build finance-tracker-v0.9.1/app/build
@@ -62,13 +69,12 @@ jobs:
           grep -n 'versionName = "0.9.1"' finance-tracker-v0.9.1/app/build.gradle.kts
           test -s finance-tracker-v0.9.1/app/dev-signing.jks
 
-      - name: Build previous signed APK for upgrade proof
-        working-directory: finance-tracker-v0.9.1
+      - name: Stage previous signed APK for upgrade proof
+        shell: bash
         run: |
           set -euo pipefail
-          gradle assembleDebug --stacktrace
-          mkdir -p ../qa-artifacts
-          cp app/build/outputs/apk/debug/app-debug.apk ../qa-artifacts/CashFlow-v0.9.1-dev.apk
+          mkdir -p qa-artifacts
+          cp previous-apk/app-debug.apk qa-artifacts/CashFlow-v0.9.1-dev.apk
 
       - name: Apply v0.10 QA hardening overlay
         shell: bash

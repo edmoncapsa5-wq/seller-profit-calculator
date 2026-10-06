@@ -1,6 +1,22 @@
 --- a/app/src/androidTest/java/com/capsawise/cashflow/ui/CriticalUiSmokeTest.kt
 +++ b/app/src/androidTest/java/com/capsawise/cashflow/ui/CriticalUiSmokeTest.kt
-@@ -22,6 +22,9 @@ class CriticalUiSmokeTest {
+@@ -2,6 +2,7 @@
+ 
+ import android.view.WindowManager
+ import androidx.compose.ui.test.assertIsDisplayed
++import androidx.compose.ui.test.hasTestTag
+ import androidx.compose.ui.test.junit4.createAndroidComposeRule
+ import androidx.compose.ui.test.onAllNodesWithText
+ import androidx.compose.ui.test.onNodeWithContentDescription
+@@ -9,6 +10,7 @@
+ import androidx.compose.ui.test.onNodeWithText
+ import androidx.compose.ui.test.performClick
+ import androidx.compose.ui.test.performScrollTo
++import androidx.compose.ui.test.performScrollToNode
+ import androidx.compose.ui.test.performTextInput
+ import androidx.test.ext.junit.runners.AndroidJUnit4
+ import com.capsawise.cashflow.MainActivity
+@@ -22,11 +24,15 @@
      @get:Rule val composeRule = createAndroidComposeRule<MainActivity>()
  
      @Test fun onboardingExposesCriticalNavigationAndSecurityControls() {
@@ -10,3 +26,50 @@
          composeRule.onNodeWithText("Set up your money").assertIsDisplayed()
          composeRule.onNodeWithTag("setup_account_name").performTextInput("QA Cash")
          composeRule.onNodeWithTag("setup_starting_balance").performTextInput("1000.00")
+         composeRule.onNodeWithTag("setup_add_account").performClick()
+-        composeRule.onNodeWithTag("setup_start_tracking").performScrollTo().performClick()
++        composeRule.onNodeWithTag("setup_list").performScrollToNode(hasTestTag("setup_start_tracking"))
++        composeRule.onNodeWithTag("setup_start_tracking").performClick()
+ 
+         composeRule.waitUntil(10_000) {
+             composeRule.onAllNodesWithText("TOTAL AVAILABLE").fetchSemanticsNodes().isNotEmpty()
+@@ -34,16 +40,23 @@
+         composeRule.onNodeWithContentDescription("Settings").assertIsDisplayed().performClick()
+         composeRule.onNodeWithText("App lock").assertIsDisplayed()
+         composeRule.onNodeWithText("Protect screen & app preview").assertIsDisplayed()
+-        composeRule.onNodeWithText("Create encrypted backup").assertIsDisplayed()
+-        composeRule.onNodeWithText("Restore encrypted backup").assertIsDisplayed()
+-        composeRule.onNodeWithText("Export transactions as CSV").assertIsDisplayed()
++        composeRule.onNodeWithText("Create encrypted backup").performScrollTo().assertIsDisplayed()
++        composeRule.onNodeWithText("Restore encrypted backup").performScrollTo().assertIsDisplayed()
++        composeRule.onNodeWithText("Export transactions as CSV").performScrollTo().assertIsDisplayed()
+ 
+-        composeRule.onNodeWithTag("secure_preview_switch").performClick()
++        composeRule.onNodeWithTag("secure_preview_switch").performScrollTo().performClick()
+         composeRule.waitForIdle()
+         composeRule.activityRule.scenario.onActivity { activity ->
+             val enabled = activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE
+             assertEquals(WindowManager.LayoutParams.FLAG_SECURE, enabled)
+         }
+-        composeRule.onNodeWithTag("secure_preview_switch").performClick()
++
++        composeRule.onNodeWithContentDescription("Settings").assertIsDisplayed().performClick()
++        composeRule.onNodeWithTag("secure_preview_switch").performScrollTo().performClick()
++        composeRule.waitForIdle()
++        composeRule.activityRule.scenario.onActivity { activity ->
++            val enabled = activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE
++            assertEquals(0, enabled)
++        }
+     }
+ }
+--- a/app/src/main/java/com/capsawise/cashflow/ui/CashFlowApp.kt
++++ b/app/src/main/java/com/capsawise/cashflow/ui/CashFlowApp.kt
+@@ -165,7 +165,7 @@
+ 
+     Scaffold(snackbarHost = { SnackbarHost(snackbar) }) { inner ->
+         LazyColumn(
+-            modifier = Modifier.fillMaxSize().padding(inner),
++            modifier = Modifier.fillMaxSize().padding(inner).testTag("setup_list"),
+             contentPadding = PaddingValues(24.dp),
+             verticalArrangement = Arrangement.spacedBy(18.dp),
+         ) {
